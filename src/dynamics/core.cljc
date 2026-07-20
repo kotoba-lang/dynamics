@@ -244,7 +244,16 @@
     :instrumentation-completeness 0.9 ;; production/reserves/output are measured with extreme precision industry-wide (barrels, cubic meters)
     :friction 0.1 ;; end-consumer purchase (fuel, electricity) is near-frictionless
     :annual-flow-usd 8.32e12
-    :source "Precedence Research 2025: global fossil fuels market ~$8.32T"}})
+    :source "Precedence Research 2025: global fossil fuels market ~$8.32T"}
+
+   :sardex-mutual-credit
+   {:cycle-time-days 30 ;; velocity of credit circulation ~12x/year (Beyond Money 2015 field study)
+    :self-funding-coefficient 0.15 ;; growth comes from network-effect utility (more members -> more useful), not a reinvestment-funded acquisition flywheel
+    :instrumentation-completeness 0.6 ;; one of the most academically-studied mutual credit networks (Nature Human Behaviour cyclic-motifs paper, LSE research), though not explicitly a growth-funnel metric
+    :friction 0.4 ;; joining requires business vetting + individual credit-limit setting, not self-serve
+    :annual-flow-usd 5.4e7
+    :member-businesses 2900
+    :source "Monneta/P2P Foundation/Beyond Money: Sardinia's Sardex network, ~2,900-4,000 member businesses at peak, ~EUR50M/yr trade volume, EUR212M+ cumulative by 2017 -- directly relevant precedent for etzhayyim's own EN/ENGI net-zero mutual credit design"}})
 
 (defn compare-archetypes
   "Structural-strength ranking over every archetype with a numeric cycle time.
