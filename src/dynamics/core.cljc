@@ -279,6 +279,16 @@
     :annual-flow-usd 2.5e7 ;; ~$100M+ distributed across 4 rounds since ~2021 launch, annualized
     :source "Optimism Collective RetroPGF: $100M+ distributed across 4 rounds as of Aug 2025, $1.3B reserved for future rounds; badgeholder-curated, distinct governance mechanism from etzhayyim's 1-SBT-1-vote"}
 
+   :bluesky-atproto-growth
+   {:cycle-time-days 1 ;; near-continuous viral/network-effect compounding; ~17,280 new users/day recently
+    :self-funding-coefficient 0.15 ;; growth is network-effect/migration-event driven, not revenue-reinvestment funded
+    :instrumentation-completeness 0.75 ;; publishes detailed growth/DAU/post-count transparency reports
+    :friction 0.05 ;; email/handle signup, no wallet, no oath
+    :new-users-2025 2.75e7 ;; ~13M (Oct 2024) -> ~40.2M (Nov 2025)
+    :daily-active-users 3.5e6
+    :source "Bluesky 2025 Transparency Report: 13M->40.2M users Oct 2024-Nov 2025, ~17,280 new users/day recently, 3.5M DAU"
+    :note "SAME AT Protocol substrate (MST, PDS, did:plc) etzhayyim's own identity architecture is built on (see orgs/etzhayyim/root CLAUDE.md '10-protocol/atproto'). This is the single most directly relevant comparison in the catalog: it demonstrates the protocol substrate itself is not the bottleneck to reaching tens of millions of real users, which sharpens the diagnosis that etzhayyim's near-zero adoption is a demand/positioning/friction problem specific to etzhayyim, not a structural ceiling of its own technical foundation"}
+
    :givedirectly-ubi
    {:cycle-time-days 30 ;; monthly unconditional cash transfers (~$40/month), some recipients for a 12-year study window
     :self-funding-coefficient 0.05 ;; donor-funded transfers to recipients don't flow back into donor acquisition
