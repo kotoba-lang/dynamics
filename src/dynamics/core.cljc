@@ -72,6 +72,31 @@
        (sort-by :base-score >)))
 
 ;; ---------------------------------------------------------------------------
+;; Zero-events upper bound -- turning "unmeasured" into "measured as ≤ X"
+;; ---------------------------------------------------------------------------
+
+(defn- pow [base exp]
+  #?(:cljs (js/Math.pow base exp)
+     :clj (Math/pow base exp)))
+
+(defn upper-bound-rate-from-zero-events
+  "The exact (1-confidence) upper bound on a Bernoulli success rate, given
+   ZERO successes observed in n trials: 1 - (1-confidence)^(1/n). For large n
+   this is well approximated by the textbook 'rule of three',
+   -ln(1-confidence)/n ~= 3/n at 95% confidence.
+
+   This is the honest way to quantify a loop whose gain has never fired once
+   you have a trial count. It is NOT a point estimate of the true rate (a
+   point estimate requires at least one observed success) -- it is a
+   defensible statement of how large the rate could plausibly be and still
+   be consistent with zero observed successes over n trials. Use this
+   instead of either (a) treating 'unmeasured' as unquantifiable, or (b)
+   silently treating it as 0."
+  [n & {:keys [confidence] :or {confidence 0.95}}]
+  {:pre [(pos? n) (< 0 confidence 1)]}
+  (- 1 (pow (- 1 confidence) (/ 1 n))))
+
+;; ---------------------------------------------------------------------------
 ;; Stock / Flow / Loop -- the entity-level shape
 ;; ---------------------------------------------------------------------------
 
@@ -245,6 +270,14 @@
     :friction 0.1 ;; end-consumer purchase (fuel, electricity) is near-frictionless
     :annual-flow-usd 8.32e12
     :source "Precedence Research 2025: global fossil fuels market ~$8.32T"}
+
+   :optimism-retropgf
+   {:cycle-time-days 90 ;; 2025 transition from annual rounds to "ongoing impact evaluation and regular rewards throughout the year"
+    :self-funding-coefficient 0.2 ;; retroactive funding from a token treasury, not directly compounding revenue
+    :instrumentation-completeness 0.7 ;; unusually rigorous impact-metrics evaluation infrastructure for a public-goods program
+    :friction 0.45 ;; curated badgeholder evaluation, not self-serve
+    :annual-flow-usd 2.5e7 ;; ~$100M+ distributed across 4 rounds since ~2021 launch, annualized
+    :source "Optimism Collective RetroPGF: $100M+ distributed across 4 rounds as of Aug 2025, $1.3B reserved for future rounds; badgeholder-curated, distinct governance mechanism from etzhayyim's 1-SBT-1-vote"}
 
    :sardex-mutual-credit
    {:cycle-time-days 30 ;; velocity of credit circulation ~12x/year (Beyond Money 2015 field study)

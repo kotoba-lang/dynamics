@@ -58,3 +58,16 @@
       (is (not (:estimate? jw)))
       (is (= 304500 (:baptisms-per-year jw)))
       (is (string? (:source jw))))))
+
+(deftest upper-bound-rate-from-zero-events-rule-of-three-test
+  (testing "for large n, the exact bound is well-approximated by the rule-of-three (~3/n at 95%)"
+    (let [n 16497
+          exact (d/upper-bound-rate-from-zero-events n)
+          rule-of-three (/ 3.0 n)]
+      (is (< (Math/abs (- exact rule-of-three)) 1e-6))))
+  (testing "a larger trial count tightens (lowers) the upper bound"
+    (is (> (d/upper-bound-rate-from-zero-events 100)
+           (d/upper-bound-rate-from-zero-events 100000))))
+  (testing "a higher confidence level raises the upper bound"
+    (is (< (d/upper-bound-rate-from-zero-events 1000 :confidence 0.90)
+           (d/upper-bound-rate-from-zero-events 1000 :confidence 0.99)))))
