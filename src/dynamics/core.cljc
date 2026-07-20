@@ -227,7 +227,24 @@
     :friction 0.5 ;; paid membership tier negotiation, not a one-click join
     :annual-flow-usd 3.113e8
     :member-orgs 3000
-    :source "Linux Foundation Annual Report 2025: $311.3M gross revenue, 3,000+ member organizations"}})
+    :source "Linux Foundation Annual Report 2025: $311.3M gross revenue, 3,000+ member organizations"}
+
+   :givewell-effective-altruism
+   {:cycle-time-days 90 ;; quarterly-ish major grant rounds; grants approved somewhat continuously
+    :self-funding-coefficient 0.25 ;; donations fund research capacity that improves recommendations, attracting more donors
+    :instrumentation-completeness 0.65 ;; publishes precise money-moved/donor-count metrics annually (distinct from its separately-famous cost-per-outcome impact rigor, not modeled here)
+    :friction 0.3 ;; a donation decision among evaluated top charities, not one-click
+    :annual-flow-usd 4.18e8
+    :donors 3.0e4
+    :source "GiveWell 2025 grantmaking year (Feb 2025-Jan 2026): $418M approved, 131 grants to 69 orgs; 2024 metrics year: 30,000+ donors"}
+
+   :global-fossil-fuel-industry
+   {:cycle-time-days 90 ;; quarterly capital-allocation/reinvestment cycle (earnings-driven capex decisions), not the daily commodity-trading cycle -- the loop modeled here is reinvestment into more extraction capacity, not spot-market turnover
+    :self-funding-coefficient 0.6 ;; revenue directly funds further exploration/extraction capex, a well-documented reinvestment flywheel, tempered by long physical lead times vs digital reinvestment
+    :instrumentation-completeness 0.9 ;; production/reserves/output are measured with extreme precision industry-wide (barrels, cubic meters)
+    :friction 0.1 ;; end-consumer purchase (fuel, electricity) is near-frictionless
+    :annual-flow-usd 8.32e12
+    :source "Precedence Research 2025: global fossil fuels market ~$8.32T"}})
 
 (defn compare-archetypes
   "Structural-strength ranking over every archetype with a numeric cycle time.
