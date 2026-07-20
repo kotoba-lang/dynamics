@@ -201,7 +201,33 @@
     :friction 0.8 ;; DID + WebAuthn passkey + on-chain SBT mint
     :annual-flow-usd 0
     :adherents 0
-    :source "orgs/etzhayyim/root/MEMBERS.md, 2026-07-20: roster empty, 'awaiting first member'"}})
+    :source "orgs/etzhayyim/root/MEMBERS.md, 2026-07-20: roster empty, 'awaiting first member'"}
+
+   :online-gambling
+   {:cycle-time-days 0.01 ;; live/in-play bets resolve in minutes to hours
+    :self-funding-coefficient 0.9 ;; house-edge revenue funds acquisition/marketing directly
+    :instrumentation-completeness 0.97 ;; player-tracking/personalization is industry-standard
+    :friction 0.05 ;; one-tap mobile betting
+    :annual-flow-usd 9.5e10
+    :source "Custom Market Insights / Precedence / Statista 2025 (range $88-105B; $95B midpoint used)"}
+
+   :wikimedia-commons
+   {:cycle-time-days 180 ;; ~semiannual banner fundraising campaign cadence
+    :self-funding-coefficient 0.2 ;; donations fund infra that serves more readers, not more donors directly
+    :instrumentation-completeness 0.75 ;; famous for rigorous banner A/B-testing of conversion rate
+    :friction 0.3 ;; donation form + payment, but no account/identity required
+    :annual-flow-usd 2.086e8
+    :donors 7.0e6
+    :source "Wikimedia Foundation FY2024-2025 audit report: $208.6M revenue, 7M+ donors, 66M+ articles"}
+
+   :linux-foundation-membership
+   {:cycle-time-days 365 ;; annual membership dues cycle
+    :self-funding-coefficient 0.4 ;; recurring institutional dues fund services that retain/attract members
+    :instrumentation-completeness 0.5 ;; precise financial reporting, but not a conversion-funnel practice
+    :friction 0.5 ;; paid membership tier negotiation, not a one-click join
+    :annual-flow-usd 3.113e8
+    :member-orgs 3000
+    :source "Linux Foundation Annual Report 2025: $311.3M gross revenue, 3,000+ member organizations"}})
 
 (defn compare-archetypes
   "Structural-strength ranking over every archetype with a numeric cycle time.
