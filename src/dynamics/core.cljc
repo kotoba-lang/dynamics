@@ -289,6 +289,18 @@
     :source "Bluesky 2025 Transparency Report: 13M->40.2M users Oct 2024-Nov 2025, ~17,280 new users/day recently, 3.5M DAU"
     :note "SAME AT Protocol substrate (MST, PDS, did:plc) etzhayyim's own identity architecture is built on (see orgs/etzhayyim/root CLAUDE.md '10-protocol/atproto'). This is the single most directly relevant comparison in the catalog: it demonstrates the protocol substrate itself is not the bottleneck to reaching tens of millions of real users, which sharpens the diagnosis that etzhayyim's near-zero adoption is a demand/positioning/friction problem specific to etzhayyim, not a structural ceiling of its own technical foundation"}
 
+   :estonia-e-residency
+   {:cycle-time-days 365 ;; mature decade-old program, annual growth reporting cadence
+    :self-funding-coefficient 0.35 ;; state fees + tax revenue fund the administration/marketing that sustains the program
+    :instrumentation-completeness 0.85 ;; publishes a live public dashboard (e-resident.gov.ee/dashboard), arguably the most transparent program in this catalog
+    :friction 0.55 ;; identity verification, background check, in-person ID pickup at an embassy -- genuinely higher friction than most digital archetypes here
+    :cumulative-e-residents 135000
+    :new-e-residents-2025 13828
+    :companies-founded-2025 5556
+    :state-revenue-2025-eur 1.25e8
+    :source "e-resident.gov.ee / ERR / Invest in Estonia 2025 reports: 135,000+ e-residents from 185 countries (10yr program), 13,828 new in 2025 (+20% YoY), 5,556 companies founded, EUR125M state revenue"
+    :note "a real government offering digital-identity-based membership with no territorial residency requirement -- directly relevant to etzhayyim's own 'routing around state functions' Charter position (Rider §1.12) and DID-based membership model, as a working precedent that a nation-state itself can run"}
+
    :givedirectly-ubi
    {:cycle-time-days 30 ;; monthly unconditional cash transfers (~$40/month), some recipients for a 12-year study window
     :self-funding-coefficient 0.05 ;; donor-funded transfers to recipients don't flow back into donor acquisition
