@@ -279,6 +279,15 @@
     :annual-flow-usd 2.5e7 ;; ~$100M+ distributed across 4 rounds since ~2021 launch, annualized
     :source "Optimism Collective RetroPGF: $100M+ distributed across 4 rounds as of Aug 2025, $1.3B reserved for future rounds; badgeholder-curated, distinct governance mechanism from etzhayyim's 1-SBT-1-vote"}
 
+   :givedirectly-ubi
+   {:cycle-time-days 30 ;; monthly unconditional cash transfers (~$40/month), some recipients for a 12-year study window
+    :self-funding-coefficient 0.05 ;; donor-funded transfers to recipients don't flow back into donor acquisition
+    :instrumentation-completeness 0.7 ;; the world's largest/longest RCT-evaluated UBI study (J-PAL/IPA academic partnership), though that rigor is about outcome measurement more than growth-funnel measurement
+    :friction 0.3 ;; from the donor-acquisition side (recipients receive with near-zero friction, but that is not the loop being modeled here)
+    :annual-flow-usd 5.8e7 ;; cumulative since 2017 launch, not strictly annual -- see source
+    :recipients 56000
+    :source "GiveDirectly UBI programs (Kenya/Malawi/Mozambique/Liberia): $58M+ to 56,000+ people since 2017, world's largest/longest UBI study (some recipients on a 12-year payment schedule); directly relevant precedent for etzhayyim's own 'Basic High Income doctrine' (orgs/etzhayyim/root ADR-2605301020)"}
+
    :sardex-mutual-credit
    {:cycle-time-days 30 ;; velocity of credit circulation ~12x/year (Beyond Money 2015 field study)
     :self-funding-coefficient 0.15 ;; growth comes from network-effect utility (more members -> more useful), not a reinvestment-funded acquisition flywheel
