@@ -99,6 +99,26 @@ checkout + classpath shape).
 ;; => {:initial 1, :checkpoints {365 18.2, 1825 87.0, 3650 172.8}}
 ```
 
+`dynamics.xmile` also has `percentage-rate-model`, the complementary shape:
+not a constant ADDITIVE inflow (`acquisition-model`), but a constant
+PROPORTIONAL/exponential rate applied to the stock itself (`Stock' = Stock
+* Annual_Rate`, rate may be negative) -- the right shape for a real,
+already-measured year-over-year percentage change on a stock/level, as
+opposed to a flow feeding an accumulator. Using the wrong shape for a given
+real fact is a modeling error even when both "run". Note this integrates
+the CONTINUOUS exponential closed form (`S0 * e^(rt)`), not discrete annual
+compounding (`S0 * (1+r)^t`) -- the two diverge slightly (e.g. 10 years at
+-4.94%/yr: continuous gives 14.10, discrete compounding gives 13.92) and
+callers should be aware of which one they're getting.
+
+```clojure
+;; real 2025->2026 ACA marketplace enrollment: 24.3M -> 23.1M, -4.938%/yr
+(def rate (- (/ 23.1 24.3) 1))
+(def decline (dx/percentage-rate-model xmile-ns {:name "aca" :initial-stock 23.1 :annual-rate rate :sim-years 30}))
+(dx/project execute/run decline [10])           ;; => {:checkpoints {10 14.1}} (millions)
+(dx/crossing-year execute/run decline rate 12.15) ;; => 13.1 (years to fall below half the 2025 peak)
+```
+
 **`dynamics.sysml` also has a second, distinct generic shape**: `fleet-model` +
 `add-fleet-requirement`, for a real population of N same-kind members
 (rather than `acquisition-system`'s fixed 3 roles) that need per-member

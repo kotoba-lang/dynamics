@@ -63,6 +63,46 @@
         (add-variable (flow "Conversions" "Inflow_Rate * Conversion_Rate"))
         (add-variable (stock "Stock" (str (double initial-stock)) {:xmile/inflows #{"Conversions"}})))))
 
+(defn percentage-rate-model
+  "Build a real XMILE model of the complementary shape to `acquisition-model`
+   above: not a constant ADDITIVE inflow, but a constant PROPORTIONAL
+   (exponential) rate applied to the stock itself -- `Stock' = Stock *
+   Annual_Rate`. This is the right shape for a real, already-measured
+   year-over-year percentage change on a STOCK (a level, e.g. current total
+   enrollment), as opposed to `acquisition-model`'s shape (a flow feeding an
+   accumulator) -- using the wrong one for a given real fact is a modeling
+   error even when both would 'run'. `annual-rate` may be negative (decline)
+   and time is in YEARS (not days) to keep the equation legible for a rate
+   that is itself already annual -- pass `:sim-days` in the caller's usual
+   sense for `project`'s API but treat both as 'years' here.
+
+   :name          string, the XMILE model name
+   :initial-stock  real number, the stock's real starting value
+   :annual-rate    real number (can be negative), e.g. a real YoY fractional
+                    change already computed from 2 real observations
+   :sim-years      simulation horizon in years
+   opts (optional)  :dt (default 0.1) :method (default :rk4)"
+  [xmile-model-ns {:keys [name initial-stock annual-rate sim-years]}
+   & [{:keys [dt method] :or {dt 0.1 method :rk4}}]]
+  (let [{:keys [model sim-specs aux flow stock add-variable]} xmile-model-ns]
+    (-> (model name {:xmile/sim-specs (sim-specs 0.0 (double sim-years) {:xmile/dt dt :xmile/method method})})
+        (add-variable (aux "Annual_Rate" (str (double annual-rate))))
+        (add-variable (flow "Change" "Stock * Annual_Rate"))
+        (add-variable (stock "Stock" (str (double initial-stock)) {:xmile/inflows #{"Change"}})))))
+
+(defn crossing-year
+  "First simulated time at which the stock's series crosses `threshold` in
+   the direction implied by `annual-rate`'s sign (rising through it if
+   positive, falling through it if negative), or nil if it never does within
+   the simulated horizon -- nil is a real finding (never crosses at this
+   rate, within this horizon), not a missing value."
+  [execute-run model annual-rate threshold]
+  (let [result (execute-run model)
+        times (:xmile/times result)
+        series (get-in result [:xmile/series "Stock"])
+        crossed? (if (neg? annual-rate) #(<= % threshold) #(>= % threshold))]
+    (some (fn [[t v]] (when (crossed? v) t)) (map vector times series))))
+
 (defn project
   "Run `model` (via the `execute-run` fn, i.e. xmile.execute/run from
    org-oasis-open-xmile) and return a small, honest summary rather than the
