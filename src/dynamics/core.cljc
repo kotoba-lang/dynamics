@@ -317,7 +317,27 @@
     :friction 0.4 ;; joining requires business vetting + individual credit-limit setting, not self-serve
     :annual-flow-usd 5.4e7
     :member-businesses 2900
-    :source "Monneta/P2P Foundation/Beyond Money: Sardinia's Sardex network, ~2,900-4,000 member businesses at peak, ~EUR50M/yr trade volume, EUR212M+ cumulative by 2017 -- directly relevant precedent for etzhayyim's own EN/ENGI net-zero mutual credit design"}})
+    :source "Monneta/P2P Foundation/Beyond Money: Sardinia's Sardex network, ~2,900-4,000 member businesses at peak, ~EUR50M/yr trade volume, EUR212M+ cumulative by 2017 -- directly relevant precedent for etzhayyim's own EN/ENGI net-zero mutual credit design"}
+
+   :labor-union-dues-organizing
+   {:cycle-time-days 30 ;; standard monthly payroll-deducted dues cycle
+    :self-funding-coefficient 0.85 ;; dues directly fund the union's own organizing/representation staff and next cycle's recruitment -- a real, well-documented flywheel (this is literally what dues checkoff exists for), though not 100%: a meaningful share funds member services and political spending, not recruitment
+    :instrumentation-completeness 0.5 ;; membership/dues totals are federally mandated public disclosure (DOL Form LM-2), but per-organizer conversion-rate instrumentation (cost per new member recruited) is not, unlike ad-platform-grade funnel measurement
+    :friction 0.5 ;; joining requires a union election/card-check campaign and employer recognition, not self-serve signup -- real but not maximal friction once a workplace is already organized (then it is closer to automatic payroll enrollment)
+    :member-count 2.0e6
+    :dues-rate-pct-of-gross-pay [1.4 2.0]
+    :source "seiu.org/members (accessed 2026-07-21): '2 million members of the Service Employees International Union'. Dues rate range from SEIU Local 503 (1.7% of gross monthly pay) and SEIU-UHW (2% of base pay) public dues-calculator pages, and SEIU Local 1021 (1.4%) -- consistent 1.4-2% band across independently-checked locals. National aggregate annual dues revenue not independently verified in this pass (DOL LM-2 filing exists at olmsapps.dol.gov but was not directly fetchable); :annual-flow-usd deliberately omitted rather than estimated from an unverified base"
+    :note "genuinely new domain for this catalog: organized labor, not covered by any prior archetype. Distinct from MLM/adtech in that self-funding here is a real, publicly-documented statutory mechanism (dues checkoff), not an inferred flywheel"}
+
+   :aca-marketplace-enrollment
+   {:cycle-time-days 365 ;; one federal open-enrollment period per year (Nov 1 - Jan 15 in most states)
+    :self-funding-coefficient 0.3 ;; CMS charges issuers a user fee on Federally-Facilitated-Marketplace premiums specifically to fund healthcare.gov's own operations -- a real, cited mechanism, but most of the loop's continuation depends on annual Congressional/subsidy policy, not this fee alone, hence a moderate (not high) coefficient
+    :instrumentation-completeness 0.9 ;; CMS publishes detailed public enrollment snapshots every cycle (the source below is one of many), unusually thorough for a government program
+    :friction 0.45 ;; requires navigating healthcare.gov, identity/income verification, and active plan selection -- real friction, though auto-reenrollment (8.8M of 23.1M for 2026) lowers it for returning enrollees specifically
+    :enrollees-2026 2.31e7
+    :enrollees-2025 2.43e7
+    :source "CMS press release 'Exchange coverage remains near record high: 23.1 million enroll for 2026' (cms.gov/newsroom, reported via KFF and HFMA 2026 coverage) + KFF (kff.org) confirming Jan 15/31 2026 open-enrollment close dates; CMS's own press release page returned HTTP 403 to direct fetch in this pass, so this citation is corroborated via 3 independent secondary sources (KFF, HFMA, ACA Signups) quoting the same CMS figures rather than the primary page directly"
+    :note "genuinely new domain: social-insurance enrollment, not covered by any prior archetype. 2026 enrollment (23.1M) DOWN 4.9% from 2025's record 24.3M following expiration of enhanced federal subsidies -- a real example of a policy-level (not product-level) friction change shrinking a loop year-over-year, relevant context for etzhayyim's own subsidy-free, no-external-funding design stance"}})
 
 (defn compare-archetypes
   "Structural-strength ranking over every archetype with a numeric cycle time.
