@@ -90,6 +90,62 @@
         (add-variable (flow "Change" "Stock * Annual_Rate"))
         (add-variable (stock "Stock" (str (double initial-stock)) {:xmile/inflows #{"Change"}})))))
 
+(defn bass-diffusion-model
+  "Build a real XMILE model of Frank Bass's 1969 new-product-growth /
+   innovation-diffusion model (Bass, F.M., 'A New Product Growth for Model
+   Consumer Durables', Management Science 15(5), 1969) -- the standard,
+   textbook system-dynamics model for adoption spreading through a bounded
+   population via TWO distinct channels at once:
+
+     Adoptions' = (p + q * Adopters/Market_Size) * (Market_Size - Adopters)
+
+   `p` (coefficient of INNOVATION / external influence) is adoption driven
+   by a source outside the adopter population itself (e.g. broadcast/mass-
+   media reach, or -- for an autonomous-publication actor fleet -- content
+   an evangelist AGENT posts that reaches non-adopters directly). `q`
+   (coefficient of IMITATION / internal influence) is adoption driven by
+   contact with EXISTING adopters -- word-of-mouth among humans, or,
+   structurally analogous but a real different regime, one evangelized
+   node (human OR agent) reaching another. `p` alone gives a decelerating
+   curve (front-loaded, like `acquisition-model`'s constant inflow bounded
+   by a shrinking pool of remaining non-adopters); a nonzero `q` gives the
+   classic S-curve -- slow start, an accelerating middle phase once enough
+   adopters exist to drive real word-of-mouth mass, then saturation as
+   `Market_Size` is approached. This is the right model SHAPE for any real
+   system where already-converted members can themselves become a
+   propagation channel -- neither `acquisition-model` (no feedback at all)
+   nor `percentage-rate-model` (proportional to the CURRENT stock alone,
+   with no bound) captures that S-curve dynamic.
+
+   THIS FUNCTION DOES NOT SUPPLY p/q ITSELF -- unlike `percentage-rate-
+   model`'s real YoY-observed rate, a `p`/`q` pair for a loop that has
+   never fired (the exact situation `dynamics.core/loop-structural-
+   strength`'s docstring already flags for `etzhayyim-adherent-loop`) has
+   NOTHING to be measured from. Callers exploring such a loop MUST label
+   `p`/`q` as an explicit, named SCENARIO (not a claimed real rate) --
+   this is the same discipline `acquisition-model`'s docstring already
+   states for a feedback/network-effect extension, now given a real,
+   citable, standard model to run those scenarios through instead of an
+   ad-hoc one.
+
+   :name          string, the XMILE model name
+   :market-size    real number, the addressable population ceiling (M)
+   :p-coefficient  external/innovation coefficient (label as measured or scenario)
+   :q-coefficient  internal/imitation coefficient (label as measured or scenario)
+   :initial-adopters  real number, the stock's real starting value
+   :sim-time       simulation horizon, in the caller's chosen time unit
+   opts (optional)  :dt (default 1.0) :method (default :rk4)"
+  [xmile-model-ns {:keys [name market-size p-coefficient q-coefficient initial-adopters sim-time]}
+   & [{:keys [dt method] :or {dt 1.0 method :rk4}}]]
+  (let [{:keys [model sim-specs aux flow stock add-variable]} xmile-model-ns]
+    (-> (model name {:xmile/sim-specs (sim-specs 0.0 (double sim-time) {:xmile/dt dt :xmile/method method})})
+        (add-variable (aux "Market_Size" (str (double market-size))))
+        (add-variable (aux "P_Coefficient" (str (double p-coefficient))))
+        (add-variable (aux "Q_Coefficient" (str (double q-coefficient))))
+        (add-variable (flow "Adoptions"
+                             "(P_Coefficient + Q_Coefficient * Stock / Market_Size) * (Market_Size - Stock)"))
+        (add-variable (stock "Stock" (str (double initial-adopters)) {:xmile/inflows #{"Adoptions"}})))))
+
 (defn crossing-year
   "First simulated time at which the stock's series crosses `threshold` in
    the direction implied by `annual-rate`'s sign (rising through it if

@@ -119,6 +119,29 @@ callers should be aware of which one they're getting.
 (dx/crossing-year execute/run decline rate 12.15) ;; => 13.1 (years to fall below half the 2025 peak)
 ```
 
+`dynamics.xmile` also has `bass-diffusion-model`, a THIRD real shape: Frank
+Bass's 1969 innovation-diffusion model (`Adoptions' = (p + q*Stock/M) *
+(M - Stock)`), the standard textbook model for adoption spreading through a
+bounded population via an EXTERNAL channel (`p`, e.g. broadcast reach) and
+an INTERNAL/imitation channel (`q`, existing adopters reaching new ones --
+word-of-mouth, or, structurally analogous, one evangelized agent/node
+reaching another). `p` alone decelerates from t=0 like `acquisition-model`;
+a nonzero `q` produces the classic S-curve (slow start, accelerating
+middle, saturation). Verified against Bass's own closed-form solution
+(`A(t) = M * (1-e^-(p+q)t) / (1+(q/p)e^-(p+q)t)`) to 3+ decimal precision in
+tests. **This function does not supply real `p`/`q`** -- for a loop that
+has never fired (no measured adoption data exists), callers MUST label
+`p`/`q` as an explicit SCENARIO, never as a claimed real rate, same
+discipline as `acquisition-model`'s own docstring on feedback extensions.
+
+```clojure
+(def bass (dx/bass-diffusion-model xmile-ns {:name "adoption" :market-size 1000
+                                              :p-coefficient 0.03 :q-coefficient 0.38
+                                              :initial-adopters 0 :sim-time 20}))
+(dx/project execute/run bass [5 10 15])
+;; => {:checkpoints {5 331.2, 10 812.8, 15 971.6}} -- slow, then fast, then saturating
+```
+
 **`dynamics.sysml` also has a second, distinct generic shape**: `fleet-model` +
 `add-fleet-requirement`, for a real population of N same-kind members
 (rather than `acquisition-system`'s fixed 3 roles) that need per-member

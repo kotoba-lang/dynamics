@@ -85,3 +85,45 @@
       (is (< -0.0494 rate -0.0493))
       (is (< 13.9 (get-in projected [:checkpoints 10]) 14.3))
       (is (< 12.5 crossing 13.5)))))
+
+(defn- bass-closed-form [p q M t]
+  (let [e (exp (* (- (+ p q)) t))
+        f (/ (- 1 e) (+ 1 (* (/ q p) e)))]
+    (* M f)))
+
+(deftest bass-diffusion-model-builds-a-valid-real-xmile-model-test
+  (testing "the generic bass-diffusion-model, given real params, is a valid XMILE model"
+    (let [built (dx/bass-diffusion-model xmile-ns {:name "test-bass" :market-size 1000 :p-coefficient 0.03
+                                                     :q-coefficient 0.38 :initial-adopters 0 :sim-time 10})]
+      (is (validate/valid? (validate/validate built))))))
+
+(deftest bass-diffusion-model-matches-closed-form-test
+  (testing "matches Bass's own closed-form solution A(t) = M * (1-e^-(p+q)t) / (1+(q/p)e^-(p+q)t) to high precision -- not just 'it runs', verified against the textbook analytic answer"
+    (let [p 0.03 q 0.38 M 1000
+          built (dx/bass-diffusion-model xmile-ns {:name "bass-closed-form-check" :market-size M :p-coefficient p
+                                                     :q-coefficient q :initial-adopters 0 :sim-time 20} {:dt 0.02})
+          projected (dx/project execute/run built [1 5 10 15 20])]
+      (doseq [t [1 5 10 15 20]]
+        (let [expected (bass-closed-form p q M t)
+              actual (get-in projected [:checkpoints t])]
+          (is (< 0.999 (/ actual expected) 1.001)
+              (str "t=" t " expected " expected " got " actual)))))))
+
+(deftest bass-diffusion-model-produces-an-s-curve-with-nonzero-q-test
+  (testing "a nonzero q (imitation/internal influence) produces acceleration through the middle -- the growth rate in the middle window must exceed the growth rate in the first window, unlike a pure p-only (no-feedback) model which only decelerates"
+    (let [built (dx/bass-diffusion-model xmile-ns {:name "s-curve-check" :market-size 1000 :p-coefficient 0.01
+                                                     :q-coefficient 0.4 :initial-adopters 0 :sim-time 15} {:dt 0.02})
+          projected (dx/project execute/run built [0 2 6 8])
+          early-rate (/ (- (get-in projected [:checkpoints 2]) (get-in projected [:checkpoints 0])) 2)
+          mid-rate (/ (- (get-in projected [:checkpoints 8]) (get-in projected [:checkpoints 6])) 2)]
+      (is (> mid-rate early-rate)))))
+
+(deftest bass-diffusion-model-p-only-decelerates-immediately-like-acquisition-model-test
+  (testing "with q=0 (no imitation channel), the model degenerates to pure decelerating adoption from t=0 -- no S-curve acceleration, matching the structural claim in the docstring"
+    (let [built (dx/bass-diffusion-model xmile-ns {:name "p-only-check" :market-size 1000 :p-coefficient 0.05
+                                                     :q-coefficient 0.0 :initial-adopters 0 :sim-time 10} {:dt 0.02})
+          projected (dx/project execute/run built [0 1 2 3])
+          rate-1 (- (get-in projected [:checkpoints 1]) (get-in projected [:checkpoints 0]))
+          rate-2 (- (get-in projected [:checkpoints 2]) (get-in projected [:checkpoints 1]))
+          rate-3 (- (get-in projected [:checkpoints 3]) (get-in projected [:checkpoints 2]))]
+      (is (> rate-1 rate-2 rate-3)))))
