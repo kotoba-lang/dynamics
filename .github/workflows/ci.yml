@@ -10,8 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: dynamics
+      - uses: actions/checkout@v4
+        with:
+          repository: kotoba-lang/org-oasis-open-xmile
+          path: org-oasis-open-xmile
+      - uses: actions/checkout@v4
+        with:
+          repository: kotoba-lang/org-omg-sysmlv2
+          path: org-omg-sysmlv2
+      - uses: actions/checkout@v4
+        with:
+          repository: kotoba-lang/dsl-core
+          path: dsl-core
+          # pinned: dsl-core's main has since migrated kotoba.dsl.problem to
+          # .kotoba (no longer directly nbb-requireable); this is the SHA
+          # org-oasis-open-xmile/org-omg-sysmlv2's own deps.edn still pin,
+          # which still carries the working .cljc.
+          ref: ac8554fe4c29dc55fc78a850044888dfcc4e1e8b
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
       - run: npm install -g nbb
-      - run: nbb --classpath "src:test" test/run_tests.cljs
+      - working-directory: dynamics
+        run: nbb --classpath "src:test:../org-oasis-open-xmile/src:../org-omg-sysmlv2/src:../dsl-core/src" test/run_tests.cljs

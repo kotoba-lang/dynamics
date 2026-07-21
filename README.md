@@ -49,10 +49,62 @@ guessed value when a loop's cycle time has never actually been observed.
 ;;     :unmeasured [:etzhayyim-adherent-loop]}
 ```
 
+## Real simulation and structural modeling: `dynamics.xmile` / `dynamics.sysml`
+
+**Correction (2026-07-21):** `kotoba-lang/org-oasis-open-xmile` (OASIS XMILE
+1.0, a real, ADR-authoritative system-dynamics engine with an actual
+Euler/RK4 simulator) already existed, and was already the designated
+computational substrate for system dynamics in kotoba-lang (`ADR-2607072350`,
+2026-07-07), when this repository's own `stock`/`flow`/`loop*`/
+`loop-structural-strength` were built two weeks later (`ADR-2607203000`,
+2026-07-20) without checking for it first -- exactly the "did you check for
+existing infrastructure before building new" failure mode this workspace's
+own CLAUDE.md repeatedly warns about elsewhere (BMC/Lean Loop tracking,
+design-quality scoring, coscientist loops). `loop-structural-strength`
+itself stays (it is a genuinely different, cheaper question -- comparative
+ranking from 4 coarse parameters, no full equation model needed per
+archetype), but any caller who wants an actual projected TRAJECTORY over
+time, not a single comparative score, should use `dynamics.xmile` instead of
+inventing another one-off simulator.
+
+- **`dynamics.xmile`** -- `acquisition-model` builds a real XMILE stock/flow
+  model (a constant real inflow rate feeding a stock through a constant
+  real conversion rate) that `xmile.execute/run` (from
+  `kotoba-lang/org-oasis-open-xmile`) actually simulates; `project` returns
+  a small summary at chosen checkpoint days.
+- **`dynamics.sysml`** -- `acquisition-system` builds the STRUCTURAL
+  counterpart, real OMG SysML v2 (via `kotoba-lang/org-omg-sysmlv2`):
+  Source/Conversion/Sink parts wired by real connections, with real,
+  traceable `RequirementUsage`s (e.g. citing an actual Charter clause) that
+  `sysml.validate` checks structurally.
+
+Both are thin, honest convenience layers: they take the needed builder fns
+from the real standard library as a map argument (`xmile-model-ns`/
+`sysml-model-ns`), rather than re-implementing or hard-depending on them,
+so this repo's own `deps.edn` stays dependency-free and callers wire the
+real libraries in via `--classpath` (see CI workflow for the exact sibling
+checkout + classpath shape).
+
+```clojure
+(require '[dynamics.xmile :as dx] '[xmile.model :as m] '[xmile.execute :as execute])
+
+(def xmile-ns {:model m/model :sim-specs m/sim-specs :aux m/aux :flow m/flow
+               :stock m/stock :add-variable m/add-variable})
+
+(def projection
+  (dx/project execute/run
+              (dx/acquisition-model xmile-ns {:name "acq" :inflow-rate 264 :conversion-rate 0.000178
+                                               :initial-stock 1 :sim-days 3650})
+              [365 1825 3650]))
+;; => {:initial 1, :checkpoints {365 18.2, 1825 87.0, 3650 172.8}}
+```
+
 ## Test
 
 ```bash
-nbb --classpath "src:test" test/run_tests.cljs
+# needs org-oasis-open-xmile, org-omg-sysmlv2, and dsl-core checked out as
+# siblings (see .github/workflows/ci.yml for the exact pinned refs)
+nbb --classpath "src:test:../org-oasis-open-xmile/src:../org-omg-sysmlv2/src:../dsl-core/src" test/run_tests.cljs
 ```
 
 ## License
