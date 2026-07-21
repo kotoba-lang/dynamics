@@ -99,6 +99,34 @@ checkout + classpath shape).
 ;; => {:initial 1, :checkpoints {365 18.2, 1825 87.0, 3650 172.8}}
 ```
 
+**`dynamics.sysml` also has a second, distinct generic shape**: `fleet-model` +
+`add-fleet-requirement`, for a real population of N same-kind members
+(rather than `acquisition-system`'s fixed 3 roles) that need per-member
+compliance tracing -- e.g. cloud-itonami's 797 per-ISIC/ISCO-code blueprint
+repos, each individually either registered in `com-junkawasaki/root`'s
+`manifest/west.yml` or not. `fleet-model` builds one PartDefinition with N
+PartUsage members nested under a Fleet usage; `add-fleet-requirement`
+attaches one shared RequirementDefinition with a per-member RequirementUsage
+(subject = that member), adding a SatisfyRequirementUsage only where the
+caller's real data says `:satisfied?` is true -- and accepts a real SUBSET
+of members for a requirement that legitimately does not apply to all of
+them (omitted members get no RequirementUsage at all for that requirement,
+keeping "not applicable" structurally distinct from "measured and failing"):
+
+```clojure
+(require '[dynamics.sysml :as ds] '[sysml.model :as sm])
+
+(def fleet
+  (ds/fleet-model sysml-ns {:fleet-name "CloudItonamiCodes" :member-definition-name "ClassificationBlueprint"
+                             :members [{:name "cloud-itonami-isic-6419"} {:name "cloud-itonami-isco-1321"}]}))
+
+(def traced
+  (ds/add-fleet-requirement sysml-ns fleet
+                             {:name "RegisteredInWorkspace" :req-id "WEST-REG"
+                              :members [{:name "cloud-itonami-isic-6419" :satisfied? true}
+                                        {:name "cloud-itonami-isco-1321" :satisfied? false}]}))
+```
+
 ## Test
 
 ```bash

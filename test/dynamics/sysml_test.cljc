@@ -47,3 +47,33 @@
              (sm/all-nested-usages built "EtzhayyimAdherentAcquisition-usage")))
       (is (= "CHARTER-0.4" (:sysml/req-id (sm/lookup built "NoStateRegistration-def"))))
       (is (= "CHARTER-1.12" (:sysml/req-id (sm/lookup built "AntiMonopoly-def")))))))
+
+(deftest fleet-model-builds-a-valid-real-sysml-model-test
+  (testing "N member PartUsages, all nested under the Fleet usage, is a structurally valid model -- distinct shape from acquisition-system's fixed 3 roles"
+    (let [built (ds/fleet-model sysml-ns {:fleet-name "Fleet" :member-definition-name "Member"
+                                           :members [{:name "a"} {:name "b"} {:name "c"}]})]
+      (is (validate/valid? (validate/validate built)))
+      (is (= #{"a-usage" "b-usage" "c-usage"} (sm/all-nested-usages built "Fleet-usage"))))))
+
+(deftest add-fleet-requirement-traces-per-member-satisfaction-test
+  (testing "each member gets its OWN RequirementUsage; satisfy is added only where satisfied? is true, never fabricated"
+    (let [fleet (ds/fleet-model sysml-ns {:fleet-name "Fleet" :member-definition-name "Member"
+                                           :members [{:name "a"} {:name "b"}]})
+          built (ds/add-fleet-requirement sysml-ns fleet
+                                           {:name "MustBeRegistered" :text "real requirement" :req-id "R-1"
+                                            :members [{:name "a" :satisfied? true} {:name "b" :satisfied? false}]})]
+      (is (validate/valid? (validate/validate built)))
+      (is (sm/requirement-usage? (sm/lookup built "a--MustBeRegistered-usage")))
+      (is (sm/requirement-usage? (sm/lookup built "b--MustBeRegistered-usage")))
+      (is (some? (sm/lookup built "a--MustBeRegistered-satisfy")))
+      (is (nil? (sm/lookup built "b--MustBeRegistered-satisfy"))))))
+
+(deftest add-fleet-requirement-supports-a-real-subset-of-members-test
+  (testing "a requirement not applicable to every member simply omits those members -- no RequirementUsage at all for them, distinct from an unsatisfied one"
+    (let [fleet (ds/fleet-model sysml-ns {:fleet-name "Fleet" :member-definition-name "Member"
+                                           :members [{:name "a"} {:name "b"}]})
+          built (ds/add-fleet-requirement sysml-ns fleet
+                                           {:name "OnlyAppliesToA" :members [{:name "a" :satisfied? true}]})]
+      (is (validate/valid? (validate/validate built)))
+      (is (sm/requirement-usage? (sm/lookup built "a--OnlyAppliesToA-usage")))
+      (is (nil? (sm/lookup built "b--OnlyAppliesToA-usage"))))))
