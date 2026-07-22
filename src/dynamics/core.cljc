@@ -220,13 +220,13 @@
     :source "Gitcoin: $60M+ cumulative to 3,700+ projects since 2019 (~$10M/yr avg)"}
 
    :etzhayyim-adherent-loop
-   {:cycle-time-days nil ;; F2 has never fired -- no observed cycle exists yet
-    :self-funding-coefficient 0.02 ;; tithe only activates after adherents exist; currently 0
+   {:cycle-time-days nil ;; still no computable cycle -- 1 join is a single data point, not a rate
+    :self-funding-coefficient 0.02 ;; tithe only activates at higher commitment levels; currently 0
     :instrumentation-completeness 0.0 ;; conversion rate has literally never been measured
     :friction 0.8 ;; DID + WebAuthn passkey + on-chain SBT mint
     :annual-flow-usd 0
-    :adherents 0
-    :source "orgs/etzhayyim/root/MEMBERS.md, 2026-07-20: roster empty, 'awaiting first member'"}
+    :adherents 1 ;; corrected 2026-07-22: no longer 0 -- PR #3302 (2026-07-20) recorded the first join
+    :source "orgs/etzhayyim/root/MEMBERS.md + PENDING-JOINS.md, checked live 2026-07-22: 1 roster row (@com-junkawasaki, Level 1/誓 Oath, joined 2026-07-20, git-side oath complete, on-chain join() still pending -- EtzhayyimMembership.sol not yet deployed to any chain). Supersedes the prior '2026-07-20: roster empty' citation, which was stale as of the same date it named -- PR #3302 merged the same day"}
 
    :online-gambling
    {:cycle-time-days 0.01 ;; live/in-play bets resolve in minutes to hours
