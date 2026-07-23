@@ -337,7 +337,82 @@
     :enrollees-2026 2.31e7
     :enrollees-2025 2.43e7
     :source "CMS press release 'Exchange coverage remains near record high: 23.1 million enroll for 2026' (cms.gov/newsroom, reported via KFF and HFMA 2026 coverage) + KFF (kff.org) confirming Jan 15/31 2026 open-enrollment close dates; CMS's own press release page returned HTTP 403 to direct fetch in this pass, so this citation is corroborated via 3 independent secondary sources (KFF, HFMA, ACA Signups) quoting the same CMS figures rather than the primary page directly"
-    :note "genuinely new domain: social-insurance enrollment, not covered by any prior archetype. 2026 enrollment (23.1M) DOWN 4.9% from 2025's record 24.3M following expiration of enhanced federal subsidies -- a real example of a policy-level (not product-level) friction change shrinking a loop year-over-year, relevant context for etzhayyim's own subsidy-free, no-external-funding design stance"}})
+    :note "genuinely new domain: social-insurance enrollment, not covered by any prior archetype. 2026 enrollment (23.1M) DOWN 4.9% from 2025's record 24.3M following expiration of enhanced federal subsidies -- a real example of a policy-level (not product-level) friction change shrinking a loop year-over-year, relevant context for etzhayyim's own subsidy-free, no-external-funding design stance"}
+
+   :bitcoin-pow-mining
+   {:cycle-time-days (/ 1 144) ;; 10-minute block target is a protocol constant, not an estimate
+    :self-funding-coefficient 0.85
+    :instrumentation-completeness 0.95 ;; network hashrate/difficulty is precisely, continuously measured every block
+    :friction 0.35
+    :estimate? true ;; self-funding-coefficient/friction are reasoned judgment applied to a real, well-documented reinvestment pattern, not a single citation
+    :annual-flow-usd 1.72e10
+    :source "The Block, '2026 Bitcoin Mining Outlook': miners projected $17.2B revenue in 2025 vs $14.7B in 2024 (block subsidy + fees); block time is a protocol-defined constant"
+    :note "earliest growth (2009-2012) had near-zero market price -- driven by cypherpunk mailing-list mission alignment (Hal Finney, first reusable PoW 2004, first BTC tx recipient Jan 2009), not speculation; Dec 2010 WikiLeaks acceptance was a legitimacy catalyst pre-dating any large market. The mining loop's structural strength is high for the same reason surveillance-adtech's is -- a cycle-time that never slips -- independent of the 'sound money' narrative around the asset itself"}
+
+   :ethereum-developer-ecosystem-esp
+   {:cycle-time-days 90 ;; Ethereum Foundation ESP quarterly disbursement/reporting cadence
+    :self-funding-coefficient 0.5
+    :instrumentation-completeness 0.7 ;; ESP publishes detailed quarterly funding/project-count reports
+    :friction 0.5 ;; formal grant application + review process, not self-serve
+    :estimate? true
+    :annual-flow-usd 1.304e8 ;; Q1 2025 $32.6M annualized
+    :source "Cointelegraph/EF blog: Ethereum Foundation ESP distributed $32.6M in Q1 2025; cumulative $148M+ to 900+ projects since 2019 (esp.ethereum.foundation)"
+    :note "this scores only the EF grants program, not Ethereum-the-network's transaction/DeFi usage loop (not separately modeled here) -- a low score here is not evidence Ethereum's growth engine is weak. 2014 crowdsale raised $18.3M selling 60M ETH at $0.31, community-funded not VC (sfox.com/coindesk); founding community Vitalik Buterin/Gavin Wood/Joseph Lubin/Charles Hoskinson. The real Band-B lever was ERC-20 as an open standard: every subsequent token project became free demand/integration surface for Ethereum itself, a structural effect this archetype's 4 parameters do not capture"}
+
+   :helium-proof-of-coverage
+   {:cycle-time-days 1
+    :self-funding-coefficient 0.3
+    :instrumentation-completeness 0.85 ;; proof-of-coverage + data-transfer accounting are cryptographically verified/on-chain
+    :friction 0.5 ;; physical hardware purchase + siting for RF coverage
+    :estimate? true
+    :source "bt-miners.com/Messari: launched July 2019, no premine, 25,000+ hotspots within <2 years; HIP-70 (2022) and HIP-138 (2024) show repeated corrective governance on token/reward design"
+    :note "a documented DePIN cautionary case: hotspot purchases were often resale/speculation-driven rather than funded by real coverage-usage revenue -- a structural (Band D) flaw, reward-flow decoupled from the actual demand-side stock. Scores identically to mlm-recruitment (83.2) in this catalog, which is not a coincidence: both have a self-funding mechanism decoupled from end-demand. 2023 Solana migration + T-Mobile 'Helium Mobile' partnership added telco-grade organizational legitimacy without changing this underlying structural gap"}
+
+   :bittensor-subnet-incentive
+   {:cycle-time-days 0.05 ;; ~72-minute epoch (360 blocks x 12s)
+    :self-funding-coefficient 0.6
+    :instrumentation-completeness 0.9 ;; fully on-chain weights/incentive/dividends via Yuma Consensus
+    :friction 0.4
+    :estimate? true
+    :source "docs.taostats.io (Yuma Consensus); 128+ active subnets as of 2025; market cap ~$2.21B (cryptorank.io, Feb 2026)"
+    :note "Dynamic TAO (Feb 2024) removed centralized emission control -- a Band-A paradigm change, not a parameter tweak. Growth is protocol-emission-funded (new TAO issuance), not literally revenue-reinvestment funded, unlike Bitcoin mining's self-funding coefficient"}
+
+   :render-network-gpu-marketplace
+   {:cycle-time-days 0.1
+    :self-funding-coefficient 0.5
+    :instrumentation-completeness 0.6
+    :friction 0.35
+    :estimate? true
+    :source "Render Network Knowledge Base/Gemini Cryptopedia: public launch April 2020 by OTOY/Jules Urbach; Solana migration late 2023; Blender Foundation partnership April 2024"
+    :note "founder OTOY brings real production-industry (VFX) credibility, an unusual authority signal for a crypto network. The Blender Foundation deal opened a 2M+ user addressable pool -- a Band-B pool-tap intervention whose conversion-rate remains unmeasured; the pool size alone says nothing about expected yield (see leverage-score's :uncomputable-until-measured discipline)"}
+
+   :akash-network-compute-marketplace
+   {:cycle-time-days 1
+    :self-funding-coefficient 0.4
+    :instrumentation-completeness 0.8 ;; on-chain bids/leases/reverse-auction fully measured (Cosmos SDK chain)
+    :friction 0.4
+    :estimate? true
+    :source "akash.network/blog/roadmap-2025 ('bringing incentives on-chain to unlock network-effects-driven supply growth'); OKX/Messari: founded 2018 by Overclock Labs (Greg Osuri, Adam Bozanchi), mainnet Sept 2020"
+    :note "the Akashian Challenge was the 2nd-largest incentivized testnet after Ethereum's own -- a directly reusable precedent for bootstrapping a founding supply-side community with a bounded-time reward program funded only from real settled activity, not pre-mine. Cosmos SDK/IBC gave Akash shared interop tooling for free, the same 'standard as growth multiplier' Band-B category as ERC-20"}
+
+   :io-net-gpu-aggregation
+   {:cycle-time-days 1
+    :self-funding-coefficient 0.45
+    :instrumentation-completeness 0.75 ;; publishes precise verified-GPU counts
+    :friction 0.25
+    :estimate? true
+    :annual-flow-usd 2.0e7 ;; "$20M+ in compute leases delivered" cited cumulative-to-date, treated as annual-scale context only
+    :source "io.net Medium/Messari: $30M Series A led by Hack VC w/ Multicoin, Solana Labs, Aptos Labs (Mar 2024); verified GPUs 60,000 (Mar 2024) -> 327,000 (Mar 2025); Co-Staking Marketplace launched Feb 2025"
+    :note "lowest friction of the compute-marketplace comparators: aggregates GPUs operators already own (incl. from other decentralized networks) rather than requiring new dedicated hardware purchase like Helium/Render/Akash; decentralized-compute market cited at $9B(2024)->$100B(2032 projected) (Messari/Nansen)"}
+
+   :cloud-murakumo-credits-current
+   {:cycle-time-days nil ;; the demand-monetization loop has never fired -- see note
+    :self-funding-coefficient 0
+    :instrumentation-completeness 0.6
+    :friction 0.6
+    :estimate? true
+    :source "90-docs/business/metrics/cloud-murakumo.edn as-of 2026-07-23: 58,660 requests/7d, 541 uniques/7d, 0 active Stripe subscriptions, 0 paid charges; fleet cost validated cheaper than spot (20.39 vs 40.55 yen/Mtok, ratio 0.50)"
+    :note "real usage exists and is instrumented (funnel/cost tracked in canvas-ledger.edn), but the paid-conversion event has zero occurrences to date -- structurally identical in kind to etzhayyim-adherent-loop's 'never fired', not a worse or better case, just equally honest about what has not yet been measured. Added alongside the 2026-07 crypto/decentralized-compute comparators (bitcoin-pow-mining through io-net-gpu-aggregation above) as part of ADR-2607203000-style comparative analysis for cloud-murakumo's own growth-loop design"}})
 
 (defn compare-archetypes
   "Structural-strength ranking over every archetype with a numeric cycle time.
