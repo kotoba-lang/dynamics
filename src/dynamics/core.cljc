@@ -523,6 +523,82 @@
     :source "coinlore.com/coin/holo/ico-tokenomics + coincarp + tokize.com Holo review 2026: ICO completed March 2018 (sale ran to 2026-04-28... i.e. 2018-04-28), raising ~$20,389,000 at $0.0006/HOT. HOT is explicitly a PLACEHOLDER for HoloFuel, swappable 1:1 during a 6-month guaranteed swap window that has not yet been activated. Holo Hosting launched using HOT specifically BECAUSE 'the native cryptocurrency HoloFuel is not yet ready' (holo.host blog / buyholo.net 2025 roadmap); a large-scale HOT-to-HoloFuel migration TEST was run April-May 2026, still pre-mainnet"
     :note "the single most directly relevant comparator for this workspace's own EN/ENGI design, which kotoba-lang/engi's README itself describes as 'exactly HoloFuel's model'. The finding is not that Holochain failed -- it is that a $20.4M-funded, decade-old, technically serious team building THE SAME mutual-credit architecture has not gotten the currency loop to fire in 8 years. Any EN roadmap that assumes a faster path than this needs to say explicitly what it is doing differently, and 'we will implement it correctly' is not an answer, because the gap here is not implementation. Sits in compare-archetypes' :unmeasured partition alongside etzhayyim-adherent-loop, cloud-murakumo-credits-current and engi-en-mutual-credit-current -- four never-fired loops, of which this is the one with the most resources and the most elapsed time."}
 
+   ;; -------------------------------------------------------------------------
+   ;; Per-institution resolution of the two aggregate money entries above
+   ;; (added 2026-07-25). The aggregates answered "how does a token economy
+   ;; compare to central banking" with one global number each, which cannot
+   ;; answer WHICH institution, in WHICH jurisdiction, on WHICH cadence. These
+   ;; do. The aggregates are kept -- they are still the right entity when the
+   ;; question is about the category rather than an actor.
+   ;;
+   ;; Cycle time here is each institution's OWN decision cadence, which differs
+   ;; materially: the Fed/ECB/BOJ each hold 8 scheduled policy meetings a year
+   ;; (~45.6 days), while the PBoC sets the Loan Prime Rate monthly and runs
+   ;; window guidance continuously and administratively -- a genuinely faster
+   ;; loop, not a modelling convenience.
+   ;; -------------------------------------------------------------------------
+
+   :fed-balance-sheet
+   {:cycle-time-days 45.6 ;; 365/8 scheduled FOMC meetings
+    :self-funding-coefficient 1.0
+    :instrumentation-completeness 0.95 ;; H.4.1 published weekly
+    :friction 0.0
+    :estimate? true ;; loop parameters reasoned; levels and dates cited
+    :total-assets-usd 6.7e12 ;; 2026-07
+    :total-assets-usd-2005 8.0e11
+    :qt-ended "2025-12-01"
+    :source "macroradar.io / thetrading.tools Fed balance sheet trackers and congress.gov CRS IF12147, July 2026: total assets ~$6.7-6.74T, +0.4% over 12 months, near the 10-year average. QT concluded 2025-12-01 targeting stabilisation near $6.6T, with only about HALF the pandemic expansion reversed after a three-year tightening cycle. 2005 level ~$800B (~6% of GDP) vs ~21% of GDP now (mises.org, citing Fed H.4.1)"
+    :note "the asymmetry is the finding, and it is measured rather than asserted: a three-year deliberate reversal undid roughly half of one expansion. Any design reasoning about 'the money printer' as a symmetric instrument is reasoning about something that has not happened."}
+
+   :bank-of-japan-balance-sheet
+   {:cycle-time-days 45.6 ;; 8 Monetary Policy Meetings/yr
+    :self-funding-coefficient 1.0
+    :instrumentation-completeness 0.95
+    :friction 0.0
+    :estimate? true
+    :total-assets-jpy 6.8377e14 ;; JPY683.77T, 2026-02
+    :m2-jpy 1.2964426e15        ;; JPY1,296.44T, 2026-06
+    :policy-rate-pct 1.0        ;; 2026-06-16, highest since 1995
+    :jgb-10y-pct 2.77           ;; late July 2026
+    :source "BOJ central bank balance sheet JPY683,770.5B (2026-02) and M2 JPY1,296,442.6B (2026-06), both via CEIC/MacroMicro series; policy rate raised to 1% on 2026-06-16, first time since 1995 (CNBC); 10y JGB ~2.77% late July 2026 (tradingeconomics/centralbank.watch). NOTE: no dated JPY/USD rate was fetched in this pass, so these are deliberately NOT converted to USD -- a comparison against the USD entries here would need one and inventing it would be exactly the fabrication this catalog forbids"
+    :note "the longest-running and most extreme version of this loop, and the only one that has run a PRICE target (YCC, 2016-09 to 2024-03) rather than a quantity target. A central bank committing to a price must buy whatever quantity defends it -- self-funding unbounded by construction. It is also the only major central bank whose exit is scheduled to stop at a permanent large purchase floor (JPY2T/month from 2027-04) rather than at zero."}
+
+   :ecb-balance-sheet
+   {:cycle-time-days 45.6 ;; 8 monetary policy meetings/yr
+    :self-funding-coefficient 1.0
+    :instrumentation-completeness 0.9
+    :friction 0.0
+    :estimate? true
+    :m3-growth-pct-2026 [{:month "2026-01" :yoy 3.3} {:month "2026-02" :yoy 3.0}
+                         {:month "2026-03" :yoy 3.2} {:month "2026-04" :yoy 2.7}]
+    :source "ECB monetary developments releases, euro area M3 annual growth: 3.3% (Jan 2026, up from 2.8% Dec), 3.0% (Feb), 3.2% (Mar), 2.7% (Apr). Balance sheet contracted through 2023-2024 via APP reinvestment ending July 2023 and partial PEPP reinvestment in H2 2024 (ECB Annual Accounts 2025; Czech National Bank analysis). NOTE: no euro-area M3 LEVEL was located in this pass, only growth rates -- so this entry deliberately carries no stock figure rather than an estimated one"
+    :note "the only one of the four whose most consequential move cost nothing to execute: the July 2012 'whatever it takes' commitment is widely credited with ending the acute sovereign crisis without a single OMT purchase. A loop parameter changed with zero flow, which no quantity-based model of this system can represent."}
+
+   :pboc-directed-credit-creation
+   {:cycle-time-days 30 ;; Loan Prime Rate is set monthly; window guidance is continuous
+    :self-funding-coefficient 1.0
+    :instrumentation-completeness 0.85 ;; monthly aggregates published; window guidance is not
+    :friction 0.05 ;; a directed loan is not solicited from the bank's side the way a Western credit application is
+    :estimate? true
+    :m2-cny 3.5671e14      ;; CNY356.71T, end-June 2026, +8.0% YoY
+    :m1-cny 1.1848e14      ;; CNY118.48T, +4.0% YoY
+    :new-loans-h1-2026-cny 1.072e13 ;; CNY10.72T of new yuan loans in H1 2026 alone
+    :tsf-outstanding-cny 4.5689e14  ;; total social financing CNY456.89T (2026-04, +7.8%)
+    :cny-per-usd 6.774              ;; 2026-07-24
+    :m2-usd-equivalent 5.266e13     ;; CNY356.71T / 6.774
+    :source "PBoC monthly data via People's Daily / CEIC / MacroMicro: M2 CNY356.71T end-June 2026 (+8.0% YoY), M1 CNY118.48T (+4.0%), new yuan loans CNY10.72T in H1 2026, total social financing outstanding CNY456.89T at end-April 2026 (+7.8%). USD/CNY 6.7740 on 2026-07-24 (tradingeconomics/exchangerates.org.uk), used for the single conversion above and stated so it can be re-derived"
+    :note "THE LARGEST MONEY-CREATION LOOP ON EARTH, and the catalog did not contain it until now. At 6.774 CNY/USD, China's M2 is ~$52.7T against US M2 of ~$23.0T -- roughly 2.3x. The mechanism also differs in kind from the other three: the binding constraint on Chinese bank credit creation is administrative (loan quotas, window guidance, TSF targets) rather than the price of money, which is why its cycle time is monthly rather than tied to a policy-meeting calendar. Any analysis that treats 'central banking' as the Fed plus three footnotes has mis-identified the largest actor in the system it is analysing."}
+
+   :us-commercial-bank-credit-creation
+   {:cycle-time-days 90 ;; quarterly capital/earnings cycle
+    :self-funding-coefficient 0.8
+    :instrumentation-completeness 0.95
+    :friction 0.4
+    :estimate? true
+    :m2-usd 2.30e13 ;; Q1 2026
+    :source "US M2 $23.0T Q1 2026, from $22.212T Sept 2025 (macromicro.me / Fed H.6). Mechanism per Bank of England Quarterly Bulletin 2014 Q1: bank deposits are 97% of broad money and banks create them BY LENDING"
+    :note "the jurisdiction-resolved half of :commercial-bank-credit-creation. Kept alongside :pboc-directed-credit-creation specifically so the two mechanisms can be compared: both create money by lending, but one is constrained by bank capital and the price of money and the other by administrative quota. The stock difference (~$23.0T vs ~$52.7T) follows from that difference, not from the size of the two economies alone."}
+
    :engi-en-mutual-credit-current
    {:cycle-time-days nil ;; zero EN transfers between any two non-operator agents; the loop has never fired
     :self-funding-coefficient 0 ;; EN is net-zero and non-minted by construction, and witness duty is rewarded in credits, whose own loop has also never fired (:cloud-murakumo-credits-current)
@@ -613,6 +689,140 @@
                                    vec)
       :no-flow-figure (->> rows (remove :annual-flow-usd) (map :id) sort vec)
       :n-both-known (count classified)})))
+
+;; ---------------------------------------------------------------------------
+;; Monetary regime changes -- the TIMING axis (added 2026-07-25)
+;; ---------------------------------------------------------------------------
+
+(def monetary-regime-changes
+  "Dated events at which a named institution changed a PARAMETER of the
+   money-creation loop, with the parameter it changed.
+
+   Why this exists: :central-bank-balance-sheet-expansion and
+   :commercial-bank-credit-creation model the loop as if its four parameters
+   were constants. They are not -- they are policy, set by identifiable
+   institutions on identifiable dates, and the loop's behaviour changes
+   discontinuously when they move. A model that cannot say WHEN a parameter
+   changed cannot explain why the same structure produced $800B of Fed balance
+   sheet in 2005 and $6.7T in 2026.
+
+   Each entry names :institution (who), :jurisdiction (where), :date (when),
+   and :changed (which loop parameter moved). Sorted chronologically. Every
+   entry carries a :source; nothing here is inferred from a general impression
+   of events.
+
+   Deliberately NOT exhaustive -- this is the set of moves large enough to
+   change a loop parameter, not a policy chronology. Adding one is adding a
+   map."
+  [{:date "2008-11-25" :institution :federal-reserve :jurisdiction :us
+    :event "QE1 announced"
+    :changed :self-funding-coefficient
+    :detail "$100B agency debt + $500B agency MBS announced; by its March 2010 end the Fed had bought $1.25T MBS, $175B agency debt, $300B Treasuries. The moment central bank asset purchase stopped being an emergency liquidity operation and became a standing balance-sheet instrument."
+    :source "FOMC statement 2008-11-25; americandeposits.com QE history; St. Louis Fed 'Quantitative Easing: How Well Does This Tool Work?' (2017)"}
+
+   {:date "2010-11" :institution :federal-reserve :jurisdiction :us
+    :event "QE2"
+    :changed :cycle-time-days
+    :detail "$600B of long-term Treasuries, signalled August 2010 and implemented November. First purchase program NOT triggered by an acute crisis -- which is what turned the instrument from episodic into cyclical."
+    :source "americandeposits.com QE history; St. Louis Fed"}
+
+   {:date "2012-07-26" :institution :ecb :jurisdiction :euro-area
+    :event "'whatever it takes'"
+    :changed :friction
+    :detail "Draghi's London remark, followed by OMT. Widely credited with ending the acute euro sovereign crisis without a single OMT purchase ever being made -- i.e. the ANNOUNCEMENT moved the loop. Included because it is the clearest case in this catalog of a loop parameter changing with zero flow: the counterparty's cost of participating fell because the backstop was believed."
+    :estimate? true
+    :source "Widely documented; a primary ECB citation was not fetched in this pass, so this entry is marked estimate? and its :detail should be read as the consensus account rather than a sourced quantity"}
+
+   {:date "2012-09" :institution :federal-reserve :jurisdiction :us
+    :event "QE3 (open-ended)"
+    :changed :cycle-time-days
+    :detail "$40B/month agency MBS, plus $45B/month Treasuries from January 2013 -- open-ended rather than a fixed total. The cycle stopped having an end date."
+    :source "FOMC September 2012; americandeposits.com QE history"}
+
+   {:date "2013-04" :institution :bank-of-japan :jurisdiction :japan
+    :event "QQE launched"
+    :changed :self-funding-coefficient
+    :detail "Quantitative and Qualitative Monetary Easing, targeting 2% inflation within two years. The most aggressive balance-sheet expansion relative to GDP attempted by any major central bank."
+    :source "Bank of Japan, April 2013; americandeposits.com QE history"}
+
+   {:date "2016-09" :institution :bank-of-japan :jurisdiction :japan
+    :event "Yield Curve Control introduced"
+    :changed :instrumentation-completeness
+    :detail "The target moved from a QUANTITY of purchases to a PRICE (the 10y JGB yield). A central bank committing to a price must buy whatever quantity defends it, which is the strongest form the self-funding coefficient can take: unbounded by construction."
+    :source "Bank of Japan, September 2016; International Journal of Central Banking, 'Yield Curve Control' (v19n5)"}
+
+   {:date "2020-03-15" :institution :federal-reserve :jurisdiction :us
+    :event "Pandemic QE (QE4)"
+    :changed :cycle-time-days
+    :detail "Treasury and MBS purchases resumed at pandemic onset. The Fed balance sheet roughly doubled within months -- the fastest parameter change in this catalog."
+    :source "FOMC 2020-03-15; americandeposits.com QE history"}
+
+   {:date "2023-07" :institution :ecb :jurisdiction :euro-area
+    :event "APP reinvestment fully discontinued"
+    :changed :self-funding-coefficient
+    :detail "Partial reinvestment March-June 2023, then complete discontinuation from July 2023; PEDD/PEPP followed with partial reinvestment in H2 2024. The first sustained REVERSAL of the loop by the ECB."
+    :source "ECB Annual Accounts 2025; Czech National Bank, 'Tightening of ECB monetary policy using balance-sheet operations'"}
+
+   {:date "2024-03" :institution :bank-of-japan :jurisdiction :japan
+    :event "Yield Curve Control abandoned"
+    :changed :instrumentation-completeness
+    :detail "Formal exit from YCC, ending the price-target regime begun in 2016. The JGB curve steepened materially afterwards; 10y reached ~2.77% by late July 2026."
+    :source "centralbank.watch Japan yield curve; ABN AMRO 'Japan: The Land of the Rising Yields'"}
+
+   {:date "2025-12-01" :institution :federal-reserve :jurisdiction :us
+    :event "Quantitative tightening ended"
+    :changed :self-funding-coefficient
+    :detail "QT concluded, targeting a balance sheet stabilising near $6.6T -- with only about HALF of the pandemic-era expansion reversed after a three-year tightening cycle. The most important single fact about this loop's asymmetry: expansion is fast and reversal is partial."
+    :source "Federal Reserve / Powell, announced for 2025-12-01; macroradar.io Fed balance sheet; congress.gov CRS IF12147 'The Fed's Balance Sheet and Quantitative Tightening'"}
+
+   {:date "2026-06-16" :institution :bank-of-japan :jurisdiction :japan
+    :event "Policy rate raised to 1%"
+    :changed :friction
+    :detail "Highest since 1995. Ends three decades in which the price of yen credit was effectively zero."
+    :source "CNBC 2026-06-16"}
+
+   {:date "2027-04" :institution :bank-of-japan :jurisdiction :japan
+    :event "JGB purchase taper reaches its floor (SCHEDULED, not yet occurred)"
+    :changed :self-funding-coefficient
+    :detail "Monthly JGB purchases reduced by JPY200B per calendar quarter, halting at JPY2T/month from April 2027 -- i.e. the BOJ has committed to remaining a permanent large buyer rather than exiting. Recorded as a scheduled FUTURE event; do not read it as observed."
+    :scheduled? true
+    :source "Bank of Japan taper schedule, reported via CNBC 2026-07-14 'Japan's bond market is back in play'"}])
+
+(defn regime-changes
+  "Query `monetary-regime-changes`. With no filter, every entry in date order.
+   Filters compose: :institution, :jurisdiction, :changed, :since, :until.
+
+   `:scheduled? true` entries are events that have NOT happened yet. They are
+   returned like any other so a caller can see what is committed, and each one
+   carries the flag so a caller can exclude them -- but the flag is never
+   applied silently, because 'what is scheduled' and 'what has occurred' are
+   both legitimate questions and guessing which one was meant is how a forecast
+   gets reported as a measurement."
+  ([] (regime-changes {}))
+  ([{:keys [institution jurisdiction changed since until]}]
+   (cond->> (sort-by :date monetary-regime-changes)
+     institution  (filter #(= institution (:institution %)))
+     jurisdiction (filter #(= jurisdiction (:jurisdiction %)))
+     changed      (filter #(= changed (:changed %)))
+     since        (filter #(>= 0 (compare since (:date %))))
+     until        (filter #(>= 0 (compare (:date %) until)))
+     true         vec)))
+
+(defn parameter-timeline
+  "Which loop parameter has been moved, how often, and by whom.
+   Returns {parameter {:count n :institutions #{...} :dates [...]}}.
+
+   The point is comparative: a parameter that several independent institutions
+   have moved repeatedly is one the model should treat as policy, not as a
+   constant to be estimated once."
+  ([] (parameter-timeline (regime-changes)))
+  ([changes]
+   (into {}
+         (for [[param es] (group-by :changed changes)]
+           [param {:count (count es)
+                   :institutions (into #{} (map :institution) es)
+                   :jurisdictions (into #{} (map :jurisdiction) es)
+                   :dates (mapv :date (sort-by :date es))}]))))
 
 (defn compare-archetypes
   "Structural-strength ranking over every archetype with a numeric cycle time.

@@ -86,14 +86,76 @@
                :holochain-holofuel-mutual-credit :engi-en-mutual-credit-current]]
       (is (contains? d/loop-archetypes k) (str k " missing from the catalog"))
       (is (string? (:source (k d/loop-archetypes))) (str k " has no :source"))))
-  (testing "the central bank is the only archetype whose next cycle is funded
-            without earning anything, and the only one its counterparty cannot decline"
-    (let [cb (:central-bank-balance-sheet-expansion d/loop-archetypes)]
-      (is (= 1.0 (:self-funding-coefficient cb)))
-      (is (= 0.0 (:friction cb)))
-      (is (= 1 (count (filter (fn [[_ v]] (and (= 1.0 (:self-funding-coefficient v))
-                                               (= 0.0 (:friction v))))
-                              d/loop-archetypes)))))))
+  (testing "a monetary authority -- and ONLY a monetary authority -- funds its next
+            cycle without earning anything AND has a counterparty who cannot decline.
+            Resolving the aggregate into named institutions (2026-07-25) turned this
+            from a claim about one entry into a claim about a class, which is the
+            stronger statement: the property tracks the institution type, not the
+            modelling choice."
+    (let [unbounded (into #{} (comp (filter (fn [[_ v]] (and (= 1.0 (:self-funding-coefficient v))
+                                                             (= 0.0 (:friction v)))))
+                                    (map key))
+                          d/loop-archetypes)]
+      (is (= #{:central-bank-balance-sheet-expansion
+               :fed-balance-sheet
+               :bank-of-japan-balance-sheet
+               :ecb-balance-sheet}
+             unbounded)
+          "exactly the monetary authorities, and nothing else in the catalog")
+      (testing "the PBoC is deliberately NOT in that set: a directed loan still has a
+                borrower, so its friction is 0.05 rather than 0. Legal tender has no
+                counterparty who can decline; a loan quota still needs someone to lend to."
+        (is (= 0.05 (:friction (:pboc-directed-credit-creation d/loop-archetypes))))
+        (is (not (contains? unbounded :pboc-directed-credit-creation))))
+      (testing "and commercial banks are not in it either -- they must earn the capital
+                that permits the next cycle"
+        (is (not (contains? unbounded :commercial-bank-credit-creation)))
+        (is (not (contains? unbounded :us-commercial-bank-credit-creation)))))))
+
+(deftest china-is-the-largest-money-creation-loop-test
+  (testing "the catalog did not contain the largest actor in the system it models
+            until 2026-07-25. China's M2 is ~2.3x US M2 at the dated FX rate used,
+            and the conversion is stated so it can be re-derived rather than trusted"
+    (let [cn (:pboc-directed-credit-creation d/loop-archetypes)
+          us (:us-commercial-bank-credit-creation d/loop-archetypes)]
+      (is (= 6.774 (:cny-per-usd cn)) "a dated rate, not an assumed one")
+      (is (< 1e-9 (Math/abs (- (:m2-usd-equivalent cn)
+                               (/ (:m2-cny cn) (:cny-per-usd cn)))))
+          "sanity: the stated USD equivalent is the stated CNY over the stated rate")
+      (is (> (:m2-usd-equivalent cn) (* 2 (:m2-usd us))))
+      (testing "and its cycle is faster than a policy-meeting calendar, because its
+                binding constraint is administrative rather than the price of money"
+        (is (< (:cycle-time-days cn) (:cycle-time-days (:fed-balance-sheet d/loop-archetypes))))))))
+
+(deftest regime-changes-are-dated-attributed-and-queryable-test
+  (testing "every regime change names who, where, when, and which loop parameter moved"
+    (doseq [c (d/regime-changes)]
+      (is (string? (:date c)))
+      (is (keyword? (:institution c)))
+      (is (keyword? (:jurisdiction c)))
+      (is (keyword? (:changed c)))
+      (is (string? (:source c)))))
+  (testing "filters compose and return chronological order"
+    (let [boj (d/regime-changes {:institution :bank-of-japan})]
+      (is (seq boj))
+      (is (= (mapv :date boj) (sort (mapv :date boj))))
+      (is (every? #(= :japan (:jurisdiction %)) boj)))
+    (is (= 1 (count (d/regime-changes {:institution :federal-reserve :since "2025-01-01"})))
+        "only QT ending falls in that window"))
+  (testing "a SCHEDULED future event is returned like any other but flagged, so a
+            caller can exclude it -- never silently, because 'what is committed' and
+            'what has occurred' are both real questions"
+    (let [future-events (filter :scheduled? (d/regime-changes))]
+      (is (= 1 (count future-events)))
+      (is (= "2027-04" (:date (first future-events))))
+      (is (= :bank-of-japan (:institution (first future-events))))))
+  (testing "parameter-timeline shows which parameters are policy rather than constants"
+    (let [tl (d/parameter-timeline)]
+      (is (contains? tl :self-funding-coefficient))
+      (is (<= 2 (count (:institutions (:self-funding-coefficient tl))))
+          "moved by more than one institution -- so it is policy, not a constant to
+           estimate once")
+      (is (every? (fn [[_ v]] (= (:dates v) (sort (:dates v)))) tl)))))
 
 (deftest mutual-credit-bracket-test
   (testing "EN sits between a 92-year-old working precedent and an 8-year-old stalled one --
