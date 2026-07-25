@@ -257,3 +257,58 @@
       (is (some? (:nominal-growth m)))
       (is (some? (:real-growth m)))
       (is (< (:real-growth m) 0) "a nominal quadrupling under 40%/yr inflation is real SHRINKAGE"))))
+
+;; ── historical depth (2026-07-25) ────────────────────────────────────────
+
+(deftest the-catalog-does-not-start-at-2008-test
+  (testing "the first version began at QE1 and thereby implied unbounded
+            self-funding was a 2008 invention. The constraint that had bounded
+            it was removed in 1971, and the institutional form dates to 1694 --
+            a model starting in 2008 mistakes a symptom for a cause"
+    (let [all (d/regime-changes)
+          earliest (first all)]
+      (is (= "1694-07-27" (:date earliest)))
+      (is (= :bank-of-england (:institution earliest)))
+      (is (<= 20 (count all)) "history, not just the recent decade")))
+  (testing "and the pre-2008 half is not an afterthought"
+    (is (<= 9 (count (d/regime-changes {:until "2007-12-31"}))))))
+
+(deftest nineteen-seventy-one-is-the-load-bearing-date-test
+  (testing "the Nixon shock is when self-funding-coefficient lost its bound, and
+            it is recorded with a real source rather than as an estimate"
+    (let [nixon (first (d/regime-changes {:since "1971-01-01" :until "1971-12-31"}))]
+      (is (= "1971-08-15" (:date nixon)))
+      (is (= :self-funding-coefficient (:changed nixon)))
+      (is (= :global (:jurisdiction nixon)))
+      (is (not (:estimate? nixon)) "primary-sourced, unlike the surrounding context entries")))
+  (testing "Bretton Woods is recorded as the BOUND that 1971 removed, so the pair
+            reads as a constraint and its removal rather than as two unrelated events"
+    (let [bw (first (d/regime-changes {:since "1944-01-01" :until "1944-12-31"}))]
+      (is (= :self-funding-coefficient (:changed bw)))
+      (is (= :bretton-woods-system (:institution bw))))))
+
+(deftest japan-invented-qe-seven-years-before-the-fed-test
+  (testing "the 2008 entries treat QE as novel; it was run in Tokyo from 2001 and
+            lifted in 2006, before the Fed started"
+    (let [boj-qe (first (d/regime-changes {:since "2001-01-01" :until "2001-12-31"}))
+          fed-qe1 (first (d/regime-changes {:since "2008-01-01" :until "2008-12-31"}))]
+      (is (= "2001-03-19" (:date boj-qe)))
+      (is (= :bank-of-japan (:institution boj-qe)))
+      (is (= "2008-11-25" (:date fed-qe1)))
+      (is (< (compare (:date boj-qe) (:date fed-qe1)) 0))
+      (is (not (:estimate? boj-qe)) "primary-sourced (SF Fed / IMF / BOJ)"))))
+
+(deftest history-widens-who-and-what-moved-test
+  (testing "institutions and jurisdictions both grow once history is included"
+    (let [insts (into #{} (map :institution) (d/regime-changes))
+          juris (into #{} (map :jurisdiction) (d/regime-changes))]
+      (is (contains? insts :bank-of-england))
+      (is (contains? insts :bretton-woods-system))
+      (is (contains? juris :global) "some parameter changes were not national")
+      (is (<= 5 (count insts)))))
+  (testing "parameter-timeline now shows self-funding-coefficient moving across
+            eight decades rather than one, which is the point of the exercise"
+    (let [sf (:self-funding-coefficient (d/parameter-timeline))]
+      (is (<= 7 (:count sf)))
+      (is (= "1694-07-27" (first (:dates sf))))
+      (is (<= 4 (count (:institutions sf)))))))
