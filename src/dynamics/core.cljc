@@ -719,20 +719,68 @@
    Deliberately NOT exhaustive -- this is the set of moves large enough to
    change a loop parameter, not a policy chronology. Adding one is adding a
    map."
-  [;; ── before 2008: where the loop's parameters actually came from ──────────
+  [;; ── before 1694: the parts that keep getting attributed to Europe ────────
    ;;
-   ;; The first version of this catalog started at QE1 (2008) and therefore
-   ;; implied that unbounded self-funding was a 2008 invention. It is not. The
-   ;; constraint that had bounded it for centuries was removed in 1971, and the
-   ;; institutional form that made the loop possible at all was built in 1694.
-   ;; A model that starts in 2008 mistakes a symptom for a cause.
+   ;; This catalog has now been wrong about its own starting point twice. It
+   ;; began at QE1 (2008), implying unbounded self-funding was invented then.
+   ;; It was extended to 1694 with the Bank of England described as "the first
+   ;; institution to hold a state's account and issue notes against it" -- and
+   ;; THAT IS FALSE ON BOTH COUNTS, corrected below. Each time the error had the
+   ;; same shape: taking the most familiar instance for the first one.
+   ;;
+   ;; The genuinely load-bearing consequence is on 1971. Removing the metallic
+   ;; bound was NOT unprecedented in 1971; it had been done, at scale, ~700
+   ;; years earlier, and the outcome is recorded.
 
-   {:date "1694-07-27" :institution :bank-of-england :jurisdiction :uk
+   {:year -2400 :date "c. 2400 BCE" :institution :lagash-temple-palace :jurisdiction :mesopotamia
+    :event "First documented debt cancellation (amargi)"
+    :changed :stock-reset
+    :detail "Credit and interest are attested in temple/palace accounting long before coinage: obligations denominated in silver and barley, recorded on ledgers, with interest. What matters structurally is the COUNTERMEASURE. Roughly thirty general debt cancellations are identified between 2400 and 1400 BCE -- amargi in Lagash, nig-sisa in Ur, andurarum in Ashur, misharum in Babylon, shudutu in Nuzi -- periodically wiping accumulated debt back down. This is the only mechanism anywhere in this catalog that systematically REVERSES a credit stock, and the modern half of the catalog contains no equivalent: the closest thing, the Fed's three-year QT, undid about half of one expansion before stopping."
+    :source "CADTM, 'The Long Tradition of Debt Cancellation in Mesopotamia and Egypt from 3000 to 1000 BC' (~30 identified general cancellations 2400-1400 BCE; earliest evidence Lagash c. 2400 BCE); Michael Hudson, 'Palatial Credit: Origins of Money and Interest' (2018) and '...and Forgive Them Their Debts' (2018)"}
+
+   {:year -1754 :date "c. 1754 BCE" :institution :babylon-palace :jurisdiction :mesopotamia
+    :event "Hammurabi-dynasty andurarum proclaimed at each accession"
+    :changed :stock-reset
+    :detail "Nearly every ruler of the dynasty opened his reign by proclaiming a debt amnesty. The clean slate was not an emergency measure but a SCHEDULED feature of the system -- the balancing loop was institutional, not discretionary. andurarum is the cognate root of the Hebrew deror, the Jubilee year."
+    :estimate? true
+    :source "CADTM (as above), citing Hudson: 'nearly each member of Hammurabi's dynasty inaugurated his rule by proclaiming a debt amnesty -- andurarum, the source of Hebrew cognate deror, the Jubilee Year'. Date is the conventional dating of Hammurabi's code, not a dated event"}
+
+   {:year 1024 :date "1024" :institution :song-government :jurisdiction :china
+    :event "Jiaozi nationalised -- first government-issued paper money"
+    :changed :stock-flow-structure
+    :detail "Paper notes appeared c. 1010 as private merchant issues in Sichuan, convertible to iron coins. In 1024 the Song government took production under state supervision at Chengdu after private issuers became insolvent, with fixed denominations and anti-counterfeiting measures. Government paper money is a Chinese invention of the 11th century -- roughly 670 years before the Bank of England, and 637 before the first European banknotes."
+    :source "Grokipedia 'Jiaozi (currency)'; deepchina.substack.com 'A groundbreaking financial innovation in ancient China'; Guan, 'The rise and fall of paper money in Yuan China, 1260-1368', Economic History Review (2024)"}
+
+   {:year 1260 :date "1260s" :institution :yuan-government :jurisdiction :china
+    :event "Chao -- first empire-wide paper money as sole legal tender, later pure fiat"
+    :changed :self-funding-coefficient
+    :detail "THE PRECEDENT THAT QUALIFIES 1971. The Yuan under Kublai Khan issued chao empire-wide as the sole legal tender, initially against silver reserves. Fiscal pressure -- military demands and civil war -- led rulers to ease the standard until a FIAT standard was adopted, i.e. the metallic bound was removed. Inflation was high early and late but moderate for nearly half a century in between, before over-issuance destroyed the currency. So the 1971 entry below is the first GLOBAL removal of the bound, not the first removal: the experiment had been run at imperial scale ~700 years earlier, sustained for decades, and then ended in hyperinflation. Any claim that unbacked issuance is untested is contradicted by this row; any claim that it fails immediately is contradicted by the fifty moderate years."
+    :source "Guan, 'The rise and fall of paper money in Yuan China, 1260-1368', Economic History Review (2024) + Manchester discussion paper EDP-2207: first regime to deploy paper money as sole legal tender, silver-backed initially, fiat standard adopted under fiscal pressure, inflation high early and late and moderate for nearly half a century"}
+
+   {:year 1609 :date "1609-01-31" :institution :bank-of-amsterdam :jurisdiction :netherlands
+    :event "Wisselbank founded -- first public bank whose accounts were not directly convertible to coin"
+    :changed :stock-flow-structure
+    :detail "Founded by the municipality of Amsterdam, modelled on the Italian public deposit banks (Banco di Rialto in Venice, and banks in Rome, Genoa, Naples). Its book-entry system let merchants settle with each other without coin moving, in a standardised unit -- the ancestor of cheques, direct debits and transfers. This, not 1694, is where deposit money detached from metal in Europe."
+    :source "BIS Working Paper No 902, 'An early stablecoin? The Bank of Amsterdam and the governance of money'; beursgeschiedenis.nl; Britannica 'Amsterdamsche Wisselbank'"}
+
+   {:year 1661 :date "1661" :institution :stockholms-banco :jurisdiction :sweden
+    :event "First banknotes in Europe"
+    :changed :stock-flow-structure
+    :detail "Stockholms Banco, founded 1657 by Johan Palmstruch, began printing banknotes in 1661 -- the first European bank to do so, 33 years before the Bank of England. It over-issued, failed, and was liquidated in 1667. The first European note issuer and the first European note-issuance failure are the same institution, which is a fact worth keeping next to every later entry in this catalog."
+    :source "Wikipedia 'Stockholms Banco' and Sveriges Riksbank historical timeline: founded 1657 by Johan Palmstruch, first European bank to print banknotes (from 1661), liquidated 1667"}
+
+   {:year 1668 :date "1668-09-17" :institution :sveriges-riksbank :jurisdiction :sweden
+    :event "Sveriges Riksbank founded -- the world's oldest surviving central bank"
+    :changed :self-funding-coefficient
+    :detail "CORRECTS THIS CATALOG'S OWN PRIOR ENTRY. Riksens Standers Bank was created by the Riksdag on 1668-09-17, taking over Palmstruch's transferred privilege after Stockholms Banco failed; renamed Sveriges Riksbank in 1866. It is 26 years older than the Bank of England. Note the origin: the world's first surviving central bank was created by a parliament to clean up a private note issuer's collapse -- the lender-of-last-resort function predates the institution that is usually credited with inventing it."
+    :source "Sveriges Riksbank, 'Sveriges Riksbank and the History of Central Banking' and its historical timeline: established 1668 by the Riksdag as Riksens Standers Bank, world's oldest surviving central bank, renamed 1866; Palmstruch's privilege transferred 1668-09-17"}
+
+   {:year 1694 :date "1694-07-27" :institution :bank-of-england :jurisdiction :uk
     :event "Bank of England chartered"
     :changed :self-funding-coefficient
-    :detail "The first institution to hold a state's account and issue notes against it -- the organisational form every entry below inherits. Included as the origin of the archetype, not as a measured parameter change."
+    :detail "CORRECTED 2026-07-25. An earlier version of this entry called the BoE 'the first institution to hold a state's account and issue notes against it'. That is wrong twice over: Stockholms Banco issued Europe's first banknotes in 1661, and Sveriges Riksbank was founded in 1668, 26 years earlier -- and government paper money itself dates to Song China in 1024. What the BoE actually is: the institution whose particular form -- a chartered private company lending to the state and issuing notes against that debt -- became the template the 19th and 20th century entries below inherited. Influential, not first. The error is left visible rather than quietly overwritten because 'the most familiar instance is the first one' is the specific mistake this catalog has now made twice."
     :estimate? true
-    :source "Bank of England Act 1694 (Royal Charter, 27 July 1694). Well documented; no primary source was fetched in this pass, so this entry is marked estimate?"}
+    :source "Bank of England Royal Charter, 27 July 1694. Well documented; no primary source fetched in this pass. The correction is sourced: see the 1661 and 1668 entries"}
 
    {:date "1913-12-23" :institution :federal-reserve :jurisdiction :us
     :event "Federal Reserve Act signed"
@@ -751,7 +799,7 @@
    {:date "1971-08-15" :institution :federal-reserve :jurisdiction :global
     :event "Nixon shock -- dollar/gold convertibility suspended"
     :changed :self-funding-coefficient
-    :detail "THE parameter change this whole catalog turns on. Nixon unilaterally suspended convertibility of the dollar into gold, ending Bretton Woods; by 1973 major currencies floated. Before this date a monetary authority's ability to fund its next cycle was bounded by a commodity it had to deliver on demand. After it, the bound was removed -- which is what makes self-funding-coefficient 1.0 a property of the CLASS rather than a description of post-2008 emergency policy. QE is a symptom of a constraint removed 37 years earlier, not the removal itself."
+    :detail "The parameter change the MODERN half of this catalog turns on. Nixon unilaterally suspended convertibility of the dollar into gold, ending Bretton Woods; by 1973 major currencies floated. Before this date a monetary authority's ability to fund its next cycle was bounded by a commodity it had to deliver on demand. After it, the bound was gone -- which is what makes self-funding-coefficient 1.0 a property of the CLASS rather than a description of post-2008 emergency policy, and it means QE is a symptom of a constraint removed 37 years earlier rather than the removal itself. QUALIFIED 2026-07-25: this was the first GLOBAL removal of the metallic bound, not the first removal. The Yuan did it empire-wide in the 13th century (see 1260s) and sustained it for roughly fifty moderate-inflation years before over-issuance destroyed the currency. Calling 1971 unprecedented would be a Eurocentric reading of a 700-year-old experiment."
     :source "Nixon address, 1971-08-15, suspending direct international convertibility of the dollar to gold, alongside wage/price freeze and import surcharge; Smithsonian realignment later that year failed and major currencies floated by 1973 (ehs.org.uk 'Ending Bretton Woods'; IMF blog 2021-08-16; firstonline.info 2021 50th-anniversary account)"}
 
    {:date "1979-10-06" :institution :federal-reserve :jurisdiction :us
@@ -862,6 +910,26 @@
     :scheduled? true
     :source "Bank of Japan taper schedule, reported via CNBC 2026-07-14 'Japan's bond market is back in play'"}])
 
+(defn- chrono-key
+  "A sortable number for an entry's position in time.
+
+  `:date` alone stops working once the catalog reaches BCE and bare-year rows:
+  string ordering puts \"1024\" before \"1609\" correctly but has no way to place
+  \"c. 2400 BCE\" at all. Ancient entries therefore carry an explicit numeric
+  `:year` (negative for BCE) and it wins; everything else derives from the
+  leading YYYY of `:date`, with the month as a fraction so same-year entries
+  keep their order."
+  [{:keys [year date]}]
+  (if (number? year)
+    (double year)
+    (let [y #?(:clj (Long/parseLong (subs date 0 4))
+               :cljs (js/parseInt (subs date 0 4) 10))
+          m (if (> (count date) 6)
+              #?(:clj (Long/parseLong (subs date 5 7))
+                 :cljs (js/parseInt (subs date 5 7) 10))
+              1)]
+      (+ (double y) (/ (double m) 13.0)))))
+
 (defn regime-changes
   "Query `monetary-regime-changes`. With no filter, every entry in date order.
    Filters compose: :institution, :jurisdiction, :changed, :since, :until.
@@ -874,12 +942,12 @@
    gets reported as a measurement."
   ([] (regime-changes {}))
   ([{:keys [institution jurisdiction changed since until]}]
-   (cond->> (sort-by :date monetary-regime-changes)
+   (cond->> (sort-by chrono-key monetary-regime-changes)
      institution  (filter #(= institution (:institution %)))
      jurisdiction (filter #(= jurisdiction (:jurisdiction %)))
      changed      (filter #(= changed (:changed %)))
-     since        (filter #(>= 0 (compare since (:date %))))
-     until        (filter #(>= 0 (compare (:date %) until)))
+     since        (filter #(<= (chrono-key {:date since}) (chrono-key %)))
+     until        (filter #(<= (chrono-key %) (chrono-key {:date until})))
      true         vec)))
 
 (defn parameter-timeline
@@ -896,7 +964,7 @@
            [param {:count (count es)
                    :institutions (into #{} (map :institution) es)
                    :jurisdictions (into #{} (map :jurisdiction) es)
-                   :dates (mapv :date (sort-by :date es))}]))))
+                   :dates (mapv :date (sort-by chrono-key es))}]))))
 
 ;; ---------------------------------------------------------------------------
 ;; Measured loop gain from adjacent indicators (added 2026-07-25)

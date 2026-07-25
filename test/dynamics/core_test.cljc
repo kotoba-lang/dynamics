@@ -155,7 +155,12 @@
       (is (<= 2 (count (:institutions (:self-funding-coefficient tl))))
           "moved by more than one institution -- so it is policy, not a constant to
            estimate once")
-      (is (every? (fn [[_ v]] (= (:dates v) (sort (:dates v)))) tl)))))
+      (testing ":dates are CHRONOLOGICAL, which since the catalog reached BCE is
+                no longer the same thing as string-sorted -- 'c. 2400 BCE' must
+                precede 'c. 1754 BCE'"
+        (doseq [[param v] tl]
+          (is (= (:dates v) (mapv :date (d/regime-changes {:changed param})))
+              (str param " dates must match regime-changes' own ordering")))))))
 
 (deftest mutual-credit-bracket-test
   (testing "EN sits between a 92-year-old working precedent and an 8-year-old stalled one --
@@ -258,34 +263,56 @@
       (is (some? (:real-growth m)))
       (is (< (:real-growth m) 0) "a nominal quadrupling under 40%/yr inflation is real SHRINKAGE"))))
 
-;; ── historical depth (2026-07-25) ────────────────────────────────────────
 
-(deftest the-catalog-does-not-start-at-2008-test
-  (testing "the first version began at QE1 and thereby implied unbounded
-            self-funding was a 2008 invention. The constraint that had bounded
-            it was removed in 1971, and the institutional form dates to 1694 --
-            a model starting in 2008 mistakes a symptom for a cause"
+;; ── historical depth, and this catalog's own two corrections ─────────────
+
+(deftest the-catalog-does-not-start-at-2008-or-1694-test
+  (testing "it started at QE1, was extended to 1694, and both were wrong in the
+            same way -- taking the most familiar instance for the first one"
     (let [all (d/regime-changes)
           earliest (first all)]
-      (is (= "1694-07-27" (:date earliest)))
-      (is (= :bank-of-england (:institution earliest)))
-      (is (<= 20 (count all)) "history, not just the recent decade")))
-  (testing "and the pre-2008 half is not an afterthought"
-    (is (<= 9 (count (d/regime-changes {:until "2007-12-31"}))))))
+      (is (= :lagash-temple-palace (:institution earliest)))
+      (is (= -2400 (:year earliest)))
+      (is (<= 28 (count all)))))
+  (testing "chronological order survives BCE, bare years and full dates together"
+    (let [ks (map (fn [e] (or (:year e)
+                              #?(:clj (Long/parseLong (subs (:date e) 0 4))
+                                 :cljs (js/parseInt (subs (:date e) 0 4) 10))))
+                  (d/regime-changes))]
+      (is (= (seq ks) (sort ks))))))
 
-(deftest nineteen-seventy-one-is-the-load-bearing-date-test
-  (testing "the Nixon shock is when self-funding-coefficient lost its bound, and
-            it is recorded with a real source rather than as an estimate"
-    (let [nixon (first (d/regime-changes {:since "1971-01-01" :until "1971-12-31"}))]
-      (is (= "1971-08-15" (:date nixon)))
+(deftest bank-of-england-was-not-first-and-the-entry-says-so-test
+  (testing "Sveriges Riksbank (1668) predates the BoE (1694) by 26 years and is
+            the oldest surviving central bank"
+    (let [riks (first (filter #(= :sveriges-riksbank (:institution %)) (d/regime-changes)))
+          boe (first (filter #(= :bank-of-england (:institution %)) (d/regime-changes)))]
+      (is (= 1668 (:year riks)))
+      (is (= 1694 (:year boe)))
+      (is (< (:year riks) (:year boe)))))
+  (testing "and Europe's first banknotes were Stockholms Banco's in 1661, by an
+            institution that then failed"
+    (let [sb (first (filter #(= :stockholms-banco (:institution %)) (d/regime-changes)))]
+      (is (= 1661 (:year sb)))))
+  (testing "the BoE entry records the correction rather than quietly dropping it"
+    (let [boe (first (filter #(= :bank-of-england (:institution %)) (d/regime-changes)))]
+      (is (re-find #"CORRECTED" (:detail boe)))
+      (is (re-find #"wrong twice over" (:detail boe))))))
+
+(deftest paper-money-and-fiat-both-predate-europe-test
+  (testing "government paper money is Song Chinese, 1024 -- 670 years before the BoE"
+    (let [jiaozi (first (filter #(= :song-government (:institution %)) (d/regime-changes)))]
+      (is (= 1024 (:year jiaozi)))
+      (is (= :china (:jurisdiction jiaozi)))))
+  (testing "and a pure fiat standard was run empire-wide in the 13th century, which
+            is what qualifies 1971 from 'unprecedented' to 'first GLOBAL instance'"
+    (let [yuan (first (filter #(= :yuan-government (:institution %)) (d/regime-changes)))
+          nixon (first (filter #(= "1971-08-15" (:date %)) (d/regime-changes)))]
+      (is (= 1260 (:year yuan)))
+      (is (= :self-funding-coefficient (:changed yuan)))
       (is (= :self-funding-coefficient (:changed nixon)))
-      (is (= :global (:jurisdiction nixon)))
-      (is (not (:estimate? nixon)) "primary-sourced, unlike the surrounding context entries")))
-  (testing "Bretton Woods is recorded as the BOUND that 1971 removed, so the pair
-            reads as a constraint and its removal rather than as two unrelated events"
-    (let [bw (first (d/regime-changes {:since "1944-01-01" :until "1944-12-31"}))]
-      (is (= :self-funding-coefficient (:changed bw)))
-      (is (= :bretton-woods-system (:institution bw))))))
+      (is (re-find #"QUALIFIED" (:detail nixon)))
+      (is (re-find #"first GLOBAL removal" (:detail nixon)))
+      (is (< (:year yuan) 1971)))))
 
 (deftest japan-invented-qe-seven-years-before-the-fed-test
   (testing "the 2008 entries treat QE as novel; it was run in Tokyo from 2001 and
@@ -295,20 +322,32 @@
       (is (= "2001-03-19" (:date boj-qe)))
       (is (= :bank-of-japan (:institution boj-qe)))
       (is (= "2008-11-25" (:date fed-qe1)))
-      (is (< (compare (:date boj-qe) (:date fed-qe1)) 0))
       (is (not (:estimate? boj-qe)) "primary-sourced (SF Fed / IMF / BOJ)"))))
 
+(deftest the-only-debt-reversing-mechanism-is-the-oldest-one-test
+  (testing "clean slates are the sole entries whose :changed is :stock-reset, and
+            nothing after 1400 BCE has one -- the modern half of this catalog has
+            no mechanism that systematically reverses a credit stock"
+    (let [resets (filter #(= :stock-reset (:changed %)) (d/regime-changes))]
+      (is (= 2 (count resets)))
+      (is (every? #(neg? (:year %)) resets))
+      (is (every? #(= :mesopotamia (:jurisdiction %)) resets))))
+  (testing "the nearest modern analogue is recorded as explicitly partial"
+    (let [qt (first (filter #(= "2025-12-01" (:date %)) (d/regime-changes)))]
+      (is (re-find #"HALF" (:detail qt))))))
+
 (deftest history-widens-who-and-what-moved-test
-  (testing "institutions and jurisdictions both grow once history is included"
+  (testing "institutions and jurisdictions both grow once real history is included"
     (let [insts (into #{} (map :institution) (d/regime-changes))
           juris (into #{} (map :jurisdiction) (d/regime-changes))]
-      (is (contains? insts :bank-of-england))
-      (is (contains? insts :bretton-woods-system))
-      (is (contains? juris :global) "some parameter changes were not national")
-      (is (<= 5 (count insts)))))
-  (testing "parameter-timeline now shows self-funding-coefficient moving across
-            eight decades rather than one, which is the point of the exercise"
+      (is (contains? juris :china))
+      (is (contains? juris :mesopotamia))
+      (is (contains? juris :sweden))
+      (is (contains? juris :global))
+      (is (<= 12 (count insts)))))
+  (testing "self-funding-coefficient now spans four millennia and starts in China,
+            not Europe"
     (let [sf (:self-funding-coefficient (d/parameter-timeline))]
-      (is (<= 7 (:count sf)))
-      (is (= "1694-07-27" (first (:dates sf))))
-      (is (<= 4 (count (:institutions sf)))))))
+      (is (<= 10 (:count sf)))
+      (is (= "1260s" (first (:dates sf))))
+      (is (contains? (:institutions sf) :yuan-government)))))
