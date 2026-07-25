@@ -196,3 +196,64 @@
         (doseq [[_ {:keys [spearman n]}] speed-vs-scale-correlation]
           (is (<= 3 n))
           (is (<= -1.0 spearman 1.0)))))))
+
+;; ── measured loop gain from adjacent indicators (2026-07-25) ─────────────
+
+(deftest cagr-is-nil-not-zero-when-undefined-test
+  (is (nil? (d/cagr 0 100 10)) "a non-positive start has no meaningful ratio")
+  (is (nil? (d/cagr 100 0 10)) "nor does a non-positive end")
+  (is (nil? (d/cagr 100 200 0)) "nor a zero-year window")
+  (is (nil? (d/cagr nil 200 10)))
+  (testing "and a real doubling over 10 years is ~7.18%/yr"
+    (is (< (Math/abs (- (d/cagr 100 200 10) 0.0717734625)) 1e-9))))
+
+(deftest real-growth-uses-the-exact-formula-not-the-subtraction-test
+  (testing "at low inflation the approximation is close, so the test that
+            matters is the high-inflation one"
+    (is (< (Math/abs (- (d/real-growth 0.07 0.02) 0.049019607843)) 1e-9)))
+  (testing "at 200% inflation, nominal-minus-inflation would say -100% real
+            growth for a loop that nominally tripled; the exact formula says
+            -66.7%. This catalog contains economies at both ends of that range,
+            so the approximation would systematically distort exactly where the
+            distinction matters most"
+    (let [exact (d/real-growth 2.0 2.0)
+          approx (- 2.0 2.0)]
+      (is (< (Math/abs (- exact 0.0)) 1e-12) "tripling under tripling prices is 0% real")
+      (is (= 0.0 approx) "here they agree...")
+      (let [exact2 (d/real-growth 1.0 2.0)
+            approx2 (- 1.0 2.0)]
+        (is (< (Math/abs (- exact2 (- (/ 2.0 3.0) 1.0))) 1e-12) "...and here they do not")
+        (is (= -1.0 approx2))
+        (is (> exact2 approx2) "the approximation understates real growth under high inflation"))))
+  (testing "nil rather than a wrong number when inflation wipes out the denominator"
+    (is (nil? (d/real-growth 0.05 -1.0)))
+    (is (nil? (d/real-growth 0.05 nil)))))
+
+(deftest money-loop-measures-never-fabricates-a-missing-quantity-test
+  (testing "every derived quantity is nil when its own inputs are missing --
+            partial data yields partial answers, not zeros"
+    (let [m (d/money-loop-measures {:broad-money-start 100 :broad-money-end 200 :years 10})]
+      (is (some? (:nominal-growth m)))
+      (is (nil? (:real-growth m)) "no inflation supplied")
+      (is (nil? (:monetization m)))
+      (is (nil? (:credit-intensity m)))
+      (is (nil? (:price m)))))
+  (testing "a fully-supplied economy yields every quantity"
+    (let [m (d/money-loop-measures {:broad-money-start 100 :broad-money-end 200 :years 10
+                                    :inflation-annual-pct 3.0
+                                    :broad-money-pct-gdp 120.0
+                                    :private-credit-pct-gdp 90.0
+                                    :lending-rate-pct 5.5})]
+      (is (< (Math/abs (- (:monetization m) 1.2)) 1e-12))
+      (is (< (Math/abs (- (:private-credit-share m) 0.9)) 1e-12))
+      (is (< (Math/abs (- (:credit-intensity m) 0.75)) 1e-12))
+      (is (< (Math/abs (- (:price m) 0.055)) 1e-12))
+      (is (< (:real-growth m) (:nominal-growth m)) "deflating a positive inflation lowers it")))
+  (testing "the nominal figure is always accompanied by its deflated twin when
+            inflation is known -- ranking on nominal LCU growth across
+            currencies is the way this analysis goes wrong"
+    (let [m (d/money-loop-measures {:broad-money-start 100 :broad-money-end 400 :years 5
+                                    :inflation-annual-pct 40.0})]
+      (is (some? (:nominal-growth m)))
+      (is (some? (:real-growth m)))
+      (is (< (:real-growth m) 0) "a nominal quadrupling under 40%/yr inflation is real SHRINKAGE"))))
