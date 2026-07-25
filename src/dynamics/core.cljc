@@ -830,6 +830,96 @@
                    :dates (mapv :date (sort-by :date es))}]))))
 
 ;; ---------------------------------------------------------------------------
+;; Measured loop gain from adjacent indicators (added 2026-07-25)
+;;
+;; Individually curating 63 central banks with dated citations is not feasible,
+;; and inventing them is forbidden. But a jurisdiction's money-creation loop
+;; leaves an OUTPUT that is reported systematically for most of the world:
+;; broad money, its ratio to GDP, private credit depth, inflation. These fns
+;; turn those adjacent series into the loop quantities the archetypes use, so
+;; coverage can grow without hand-curating an institution per economy.
+;;
+;; The load-bearing correction is `real-growth`. Nominal broad-money growth in
+;; local currency is NOT comparable across jurisdictions -- it mixes real
+;; expansion with currency debasement, and a naive ranking on it would put every
+;; high-inflation economy at the top and read that as monetary dynamism. It is
+;; the single most likely way this particular analysis goes wrong, which is why
+;; the nominal figure is never returned without its deflated twin.
+;; ---------------------------------------------------------------------------
+
+(defn cagr
+  "Compound annual growth rate from `start` to `end` over `years`, as a
+   fraction (0.07 = 7%/yr). nil -- never 0 -- when it is undefined: a
+   non-positive start (no meaningful ratio), a non-positive year count, or a
+   missing endpoint. A nil here means 'not computable from what we have',
+   which is a different fact from 'flat'."
+  [start end years]
+  (when (and (number? start) (number? end) (number? years)
+             (pos? start) (pos? years) (pos? end))
+    (- (pow (/ (double end) (double start)) (/ 1.0 years)) 1.0)))
+
+(defn real-growth
+  "Deflate a nominal growth rate by inflation, exactly:
+   (1+nominal)/(1+inflation) - 1. Both as fractions.
+
+   NOT nominal minus inflation. The subtraction approximation is fine at 2%
+   and badly wrong at 200%, and this catalog contains economies at both ends --
+   using it would systematically overstate real money growth in precisely the
+   jurisdictions where the distinction matters most.
+
+   nil when either input is missing, or when inflation is <= -100% (the
+   denominator vanishes)."
+  [nominal inflation]
+  (when (and (number? nominal) (number? inflation) (> (+ 1.0 inflation) 0.0))
+    (- (/ (+ 1.0 nominal) (+ 1.0 inflation)) 1.0)))
+
+(defn money-loop-measures
+  "Per-jurisdiction loop measures from adjacent indicators.
+
+   Input is one economy's observed series:
+     {:broad-money-start n :broad-money-end n :years n
+      :inflation-annual-pct n        ;; average over the window, in PERCENT
+      :broad-money-pct-gdp n
+      :private-credit-pct-gdp n
+      :lending-rate-pct n}
+
+   Returns the derived loop quantities, each nil when its inputs are missing:
+     :nominal-growth   the raw LCU compounding rate -- reported, but never to
+                       be ranked across currencies
+     :real-growth      the comparable one
+     :monetization     broad money as a share of GDP: the STOCK the loop has
+                       accumulated relative to what the economy produces
+     :private-credit-share
+                       how much of that creation reached private borrowers
+                       rather than government -- the BoE mechanism's actual
+                       footprint (BoE QB 2014 Q1: banks create deposits BY
+                       LENDING, so this is the closest observable to the loop
+                       itself rather than to its residue)
+     :credit-intensity private credit / broad money: of the money that exists,
+                       what fraction is private-sector credit
+     :price            the lending rate, i.e. what the loop charges
+
+   Deliberately returns no single composite score. The four quantities answer
+   different questions and a weighted blend would hide which one is driving a
+   ranking -- the same reason `compare-archetypes-2d` refuses to collapse speed
+   and scale."
+  [{:keys [broad-money-start broad-money-end years inflation-annual-pct
+           broad-money-pct-gdp private-credit-pct-gdp lending-rate-pct]}]
+  (let [nom (cagr broad-money-start broad-money-end years)
+        infl (when (number? inflation-annual-pct) (/ inflation-annual-pct 100.0))]
+    {:nominal-growth nom
+     :real-growth (real-growth nom infl)
+     :inflation infl
+     :monetization (when (number? broad-money-pct-gdp) (/ broad-money-pct-gdp 100.0))
+     :private-credit-share (when (number? private-credit-pct-gdp)
+                             (/ private-credit-pct-gdp 100.0))
+     :credit-intensity (when (and (number? private-credit-pct-gdp)
+                                  (number? broad-money-pct-gdp)
+                                  (pos? broad-money-pct-gdp))
+                         (/ private-credit-pct-gdp broad-money-pct-gdp))
+     :price (when (number? lending-rate-pct) (/ lending-rate-pct 100.0))}))
+
+;; ---------------------------------------------------------------------------
 ;; Coverage against a real denominator (added 2026-07-25)
 ;; ---------------------------------------------------------------------------
 
