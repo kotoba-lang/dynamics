@@ -171,7 +171,7 @@
     :self-funding-coefficient 0.95
     :instrumentation-completeness 0.98
     :friction 0.05
-    :annual-flow-usd 7.8e11
+    :annual-flow-usd 7.8e11 :flow-kind :operator-revenue ;; global digital ad spend = revenue accruing to the ad industry
     :source "eMarketer/Statista/Precedence Research 2025: global digital ad spend ~$750-800B/yr"}
 
    :speculative-crypto-derivatives
@@ -179,7 +179,7 @@
     :self-funding-coefficient 0.9
     :instrumentation-completeness 0.95
     :friction 0.03
-    :annual-flow-usd 8.57e13
+    :annual-flow-usd 8.57e13 :flow-kind :gross-volume-settled ;; $85.7T annual derivatives VOLUME, not revenue
     :source "CoinGlass 2025 Crypto Derivatives Outlook: $85.7T annual volume, $264.5B/day avg"}
 
    :mlm-recruitment
@@ -187,7 +187,7 @@
     :self-funding-coefficient 0.7
     :instrumentation-completeness 0.85
     :friction 0.2
-    :annual-flow-usd 2.1e11
+    :annual-flow-usd 2.1e11 :flow-kind :operator-revenue ;; WFDSA reports industry revenue
     :participants 1.8e8
     :source "WFDSA / industry reports 2025: ~$207-223B revenue, 180M+ participants, 100+ countries"}
 
@@ -216,7 +216,7 @@
     :self-funding-coefficient 0.15
     :instrumentation-completeness 0.6
     :friction 0.35
-    :annual-flow-usd 1.0e7
+    :annual-flow-usd 1.0e7 :flow-kind :grants-distributed ;; Gitcoin funds moved TO projects
     :source "Gitcoin: $60M+ cumulative to 3,700+ projects since 2019 (~$10M/yr avg)"}
 
    :etzhayyim-adherent-loop
@@ -224,7 +224,7 @@
     :self-funding-coefficient 0.02 ;; tithe only activates at higher commitment levels; currently 0
     :instrumentation-completeness 0.0 ;; conversion rate has literally never been measured
     :friction 0.8 ;; DID + WebAuthn passkey + on-chain SBT mint
-    :annual-flow-usd 0
+    :annual-flow-usd 0 :flow-kind :operator-revenue ;; zero revenue, same kind as any operator-revenue entry
     :adherents 1 ;; corrected 2026-07-22: no longer 0 -- PR #3302 (2026-07-20) recorded the first join
     :source "orgs/etzhayyim/root/MEMBERS.md + PENDING-JOINS.md, checked live 2026-07-22: 1 roster row (@com-junkawasaki, Level 1/誓 Oath, joined 2026-07-20, git-side oath complete, on-chain join() still pending -- EtzhayyimMembership.sol not yet deployed to any chain). Supersedes the prior '2026-07-20: roster empty' citation, which was stale as of the same date it named -- PR #3302 merged the same day"}
 
@@ -233,7 +233,7 @@
     :self-funding-coefficient 0.9 ;; house-edge revenue funds acquisition/marketing directly
     :instrumentation-completeness 0.97 ;; player-tracking/personalization is industry-standard
     :friction 0.05 ;; one-tap mobile betting
-    :annual-flow-usd 9.5e10
+    :annual-flow-usd 9.5e10 :flow-kind :market-size ;; cited as market size (Custom Market Insights/Precedence)
     :source "Custom Market Insights / Precedence / Statista 2025 (range $88-105B; $95B midpoint used)"}
 
    :wikimedia-commons
@@ -241,7 +241,7 @@
     :self-funding-coefficient 0.2 ;; donations fund infra that serves more readers, not more donors directly
     :instrumentation-completeness 0.75 ;; famous for rigorous banner A/B-testing of conversion rate
     :friction 0.3 ;; donation form + payment, but no account/identity required
-    :annual-flow-usd 2.086e8
+    :annual-flow-usd 2.086e8 :flow-kind :operator-revenue ;; WMF audited revenue
     :donors 7.0e6
     :source "Wikimedia Foundation FY2024-2025 audit report: $208.6M revenue, 7M+ donors, 66M+ articles"}
 
@@ -250,7 +250,7 @@
     :self-funding-coefficient 0.4 ;; recurring institutional dues fund services that retain/attract members
     :instrumentation-completeness 0.5 ;; precise financial reporting, but not a conversion-funnel practice
     :friction 0.5 ;; paid membership tier negotiation, not a one-click join
-    :annual-flow-usd 3.113e8
+    :annual-flow-usd 3.113e8 :flow-kind :operator-revenue ;; LF gross revenue
     :member-orgs 3000
     :source "Linux Foundation Annual Report 2025: $311.3M gross revenue, 3,000+ member organizations"}
 
@@ -259,7 +259,7 @@
     :self-funding-coefficient 0.25 ;; donations fund research capacity that improves recommendations, attracting more donors
     :instrumentation-completeness 0.65 ;; publishes precise money-moved/donor-count metrics annually (distinct from its separately-famous cost-per-outcome impact rigor, not modeled here)
     :friction 0.3 ;; a donation decision among evaluated top charities, not one-click
-    :annual-flow-usd 4.18e8
+    :annual-flow-usd 4.18e8 :flow-kind :grants-distributed ;; grants approved to charities
     :donors 3.0e4
     :source "GiveWell 2025 grantmaking year (Feb 2025-Jan 2026): $418M approved, 131 grants to 69 orgs; 2024 metrics year: 30,000+ donors"}
 
@@ -268,7 +268,7 @@
     :self-funding-coefficient 0.6 ;; revenue directly funds further exploration/extraction capex, a well-documented reinvestment flywheel, tempered by long physical lead times vs digital reinvestment
     :instrumentation-completeness 0.9 ;; production/reserves/output are measured with extreme precision industry-wide (barrels, cubic meters)
     :friction 0.1 ;; end-consumer purchase (fuel, electricity) is near-frictionless
-    :annual-flow-usd 8.32e12
+    :annual-flow-usd 8.32e12 :flow-kind :market-size ;; Precedence 'global fossil fuels market'
     :source "Precedence Research 2025: global fossil fuels market ~$8.32T"}
 
    :optimism-retropgf
@@ -276,7 +276,7 @@
     :self-funding-coefficient 0.2 ;; retroactive funding from a token treasury, not directly compounding revenue
     :instrumentation-completeness 0.7 ;; unusually rigorous impact-metrics evaluation infrastructure for a public-goods program
     :friction 0.45 ;; curated badgeholder evaluation, not self-serve
-    :annual-flow-usd 2.5e7 ;; ~$100M+ distributed across 4 rounds since ~2021 launch, annualized
+    :annual-flow-usd 2.5e7 :flow-kind :grants-distributed ;; retroactive funding distributed ;; ~$100M+ distributed across 4 rounds since ~2021 launch, annualized
     :source "Optimism Collective RetroPGF: $100M+ distributed across 4 rounds as of Aug 2025, $1.3B reserved for future rounds; badgeholder-curated, distinct governance mechanism from etzhayyim's 1-SBT-1-vote"}
 
    :bluesky-atproto-growth
@@ -306,7 +306,7 @@
     :self-funding-coefficient 0.05 ;; donor-funded transfers to recipients don't flow back into donor acquisition
     :instrumentation-completeness 0.7 ;; the world's largest/longest RCT-evaluated UBI study (J-PAL/IPA academic partnership), though that rigor is about outcome measurement more than growth-funnel measurement
     :friction 0.3 ;; from the donor-acquisition side (recipients receive with near-zero friction, but that is not the loop being modeled here)
-    :annual-flow-usd 5.8e7 ;; cumulative since 2017 launch, not strictly annual -- see source
+    :annual-flow-usd 5.8e7 :flow-kind :grants-distributed ;; cash transfers to recipients ;; cumulative since 2017 launch, not strictly annual -- see source
     :recipients 56000
     :source "GiveDirectly UBI programs (Kenya/Malawi/Mozambique/Liberia): $58M+ to 56,000+ people since 2017, world's largest/longest UBI study (some recipients on a 12-year payment schedule); directly relevant precedent for etzhayyim's own 'Basic High Income doctrine' (orgs/etzhayyim/root ADR-2605301020)"}
 
@@ -315,7 +315,7 @@
     :self-funding-coefficient 0.15 ;; growth comes from network-effect utility (more members -> more useful), not a reinvestment-funded acquisition flywheel
     :instrumentation-completeness 0.6 ;; one of the most academically-studied mutual credit networks (Nature Human Behaviour cyclic-motifs paper, LSE research), though not explicitly a growth-funnel metric
     :friction 0.4 ;; joining requires business vetting + individual credit-limit setting, not self-serve
-    :annual-flow-usd 5.4e7
+    :annual-flow-usd 5.4e7 :flow-kind :gross-volume-settled ;; EUR50M/yr TRADE volume through the circuit
     :member-businesses 2900
     :source "Monneta/P2P Foundation/Beyond Money: Sardinia's Sardex network, ~2,900-4,000 member businesses at peak, ~EUR50M/yr trade volume, EUR212M+ cumulative by 2017 -- directly relevant precedent for etzhayyim's own EN/ENGI net-zero mutual credit design"}
 
@@ -345,7 +345,7 @@
     :instrumentation-completeness 0.95 ;; network hashrate/difficulty is precisely, continuously measured every block
     :friction 0.35
     :estimate? true ;; self-funding-coefficient/friction are reasoned judgment applied to a real, well-documented reinvestment pattern, not a single citation
-    :annual-flow-usd 1.72e10
+    :annual-flow-usd 1.72e10 :flow-kind :operator-revenue ;; miner revenue = block subsidy + fees
     :source "The Block, '2026 Bitcoin Mining Outlook': miners projected $17.2B revenue in 2025 vs $14.7B in 2024 (block subsidy + fees); block time is a protocol-defined constant"
     :note "earliest growth (2009-2012) had near-zero market price -- driven by cypherpunk mailing-list mission alignment (Hal Finney, first reusable PoW 2004, first BTC tx recipient Jan 2009), not speculation; Dec 2010 WikiLeaks acceptance was a legitimacy catalyst pre-dating any large market. The mining loop's structural strength is high for the same reason surveillance-adtech's is -- a cycle-time that never slips -- independent of the 'sound money' narrative around the asset itself"}
 
@@ -355,7 +355,7 @@
     :instrumentation-completeness 0.7 ;; ESP publishes detailed quarterly funding/project-count reports
     :friction 0.5 ;; formal grant application + review process, not self-serve
     :estimate? true
-    :annual-flow-usd 1.304e8 ;; Q1 2025 $32.6M annualized
+    :annual-flow-usd 1.304e8 :flow-kind :grants-distributed ;; ESP disbursements to projects ;; Q1 2025 $32.6M annualized
     :source "Cointelegraph/EF blog: Ethereum Foundation ESP distributed $32.6M in Q1 2025; cumulative $148M+ to 900+ projects since 2019 (esp.ethereum.foundation)"
     :note "this scores only the EF grants program, not Ethereum-the-network's transaction/DeFi usage loop (not separately modeled here) -- a low score here is not evidence Ethereum's growth engine is weak. 2014 crowdsale raised $18.3M selling 60M ETH at $0.31, community-funded not VC (sfox.com/coindesk); founding community Vitalik Buterin/Gavin Wood/Joseph Lubin/Charles Hoskinson. The real Band-B lever was ERC-20 as an open standard: every subsequent token project became free demand/integration surface for Ethereum itself, a structural effect this archetype's 4 parameters do not capture"}
 
@@ -401,7 +401,7 @@
     :instrumentation-completeness 0.75 ;; publishes precise verified-GPU counts
     :friction 0.25
     :estimate? true
-    :annual-flow-usd 2.0e7 ;; "$20M+ in compute leases delivered" cited cumulative-to-date, treated as annual-scale context only
+    :annual-flow-usd 2.0e7 :flow-kind :gross-volume-settled ;; compute leases delivered ;; "$20M+ in compute leases delivered" cited cumulative-to-date, treated as annual-scale context only
     :source "io.net Medium/Messari: $30M Series A led by Hack VC w/ Multicoin, Solana Labs, Aptos Labs (Mar 2024); verified GPUs 60,000 (Mar 2024) -> 327,000 (Mar 2025); Co-Staking Marketplace launched Feb 2025"
     :note "lowest friction of the compute-marketplace comparators: aggregates GPUs operators already own (incl. from other decentralized networks) rather than requiring new dedicated hardware purchase like Helium/Render/Akash; decentralized-compute market cited at $9B(2024)->$100B(2032 projected) (Messari/Nansen)"}
 
@@ -412,13 +412,216 @@
     :friction 0.6
     :estimate? true
     :source "90-docs/business/metrics/cloud-murakumo.edn as-of 2026-07-23: 58,660 requests/7d, 541 uniques/7d, 0 active Stripe subscriptions, 0 paid charges; fleet cost validated cheaper than spot (20.39 vs 40.55 yen/Mtok, ratio 0.50)"
-    :note "real usage exists and is instrumented (funnel/cost tracked in canvas-ledger.edn), but the paid-conversion event has zero occurrences to date -- structurally identical in kind to etzhayyim-adherent-loop's 'never fired', not a worse or better case, just equally honest about what has not yet been measured. Added alongside the 2026-07 crypto/decentralized-compute comparators (bitcoin-pow-mining through io-net-gpu-aggregation above) as part of ADR-2607203000-style comparative analysis for cloud-murakumo's own growth-loop design"}})
+    :note "real usage exists and is instrumented (funnel/cost tracked in canvas-ledger.edn), but the paid-conversion event has zero occurrences to date -- structurally identical in kind to etzhayyim-adherent-loop's 'never fired', not a worse or better case, just equally honest about what has not yet been measured. Added alongside the 2026-07 crypto/decentralized-compute comparators (bitcoin-pow-mining through io-net-gpu-aggregation above) as part of ADR-2607203000-style comparative analysis for cloud-murakumo's own growth-loop design"}
+
+   ;; -------------------------------------------------------------------------
+   ;; Incumbent money-system comparators (added 2026-07-25).
+   ;;
+   ;; The catalog previously held crypto/DePIN networks and one mutual-credit
+   ;; network (sardex) but NO incumbent monetary rail -- so a question of the
+   ;; form "how does our token economy compare to central banking and card
+   ;; networks?" had no admissible comparator and could only be answered by
+   ;; assertion. These 8 entries close that gap with real, dated, cited figures.
+   ;;
+   ;; Cycle-time convention used uniformly below (stated because
+   ;; loop-structural-strength is dominated by cycles-per-year, so the choice
+   ;; is load-bearing and must be auditable): ONE CYCLE = the shortest interval
+   ;; at which this loop's own output actually funds its next input. For a card
+   ;; network that is settlement (T+1, when interchange is assessed and
+   ;; realized), for a chain it is the block/slot, for a central bank it is the
+   ;; policy meeting, for a bank balance sheet it is the capital-reporting
+   ;; quarter. Comparisons ACROSS entries whose natural cycle definitions
+   ;; differ by orders of magnitude should be read as bands, not as precise
+   ;; rankings -- see this namespace's own "auditable heuristic, not a
+   ;; physics-grade computation" disclaimer.
+   ;; -------------------------------------------------------------------------
+
+   :visa-card-network-interchange
+   {:cycle-time-days 1 ;; T+1 settlement -- the point at which interchange is actually assessed and realized as revenue
+    :self-funding-coefficient 0.9 ;; interchange revenue directly funds issuer rewards, which directly drive the next transaction -- among the most literally self-funding loops in this catalog: a premium rewards card's lounge access/3x points ARE the interchange, recycled
+    :instrumentation-completeness 0.95 ;; every transaction authorized, scored, and attributed; issuers run precise per-cardholder LTV/attrition models
+    :friction 0.02 ;; contactless tap is the lowest-friction payment act that exists; the counterparty does nothing but hold the card near a terminal
+    :estimate? true ;; the 4 loop parameters are reasoned judgment over a well-documented mechanism; the flow/volume figures below are cited
+    :annual-flow-usd 1.7e13 :flow-kind :gross-volume-settled ;; Visa total payments and cash volume, FY2025
+    :network-revenue-usd 4.0e10 ;; Visa net revenue FY2025, +11% YoY
+    :transactions-per-year 3.29e11 ;; 329B Visa-branded transactions, ~901M/day
+    :us-swipe-fees-usd 1.9825e11 ;; ALL US card processing fees 2025 (credit alone $157.8B; Visa+MC interchange $118.8B)
+    :source "Visa FY2025 Form 10-K / Q4 FY2025 earnings (sec.gov, annualreport.visa.com): $17T total payments and cash volume, $40B net revenue (+11%), 329B transactions (~901M/day), FY ending 2026-09-30... NOTE: fiscal year ended 2025-09-30. US swipe-fee totals: Nilson-derived reporting via cardrates.com / thehardwareconnection.com 2026: record $198.25B US card processing fees in 2025, $157.8B credit-only, Visa+MC interchange $118.8B (vs $25.6B in 2009); avg V/MC credit rate 2.02% (2010) -> 2.36% (2025)"
+    :note "the single most important comparator for any payments-adjacent design in this workspace, and it was missing. Two structural facts a token economy must reckon with: (1) the loop is funded by a fee the END USER NEVER SEES -- the merchant pays, the cardholder is PAID (rewards), which inverts the usual friction/incentive alignment and is why 'lower fees' has never been sufficient to dislodge it; (2) at 2.36% average the rail is expensive in a way an on-chain USDC transfer is not, yet volume still grew, which falsifies the common assumption that settlement cost is the binding constraint on payment-rail adoption. Distribution and default-status are."}
+
+   :commercial-bank-credit-creation
+   {:cycle-time-days 90 ;; quarterly capital/earnings cycle -- the interval at which retained net interest income becomes regulatory capital and thus new lending capacity
+    :self-funding-coefficient 0.8 ;; net interest income retained into capital expands lending capacity at roughly the Basel leverage multiple; the loop's output (interest) literally buys the constraint (capital) that limits its next cycle
+    :instrumentation-completeness 0.95 ;; the most precisely measured system in this catalog: statutory regulatory reporting, per-loan credit scoring, mandated disclosure
+    :friction 0.4 ;; loan application, underwriting, collateral -- real friction, but routine and well-tooled
+    :estimate? true ;; loop parameters are reasoned judgment; the 97% share and the money-creation mechanism itself are cited primary-source facts, not estimates
+    :broad-money-share-pct 97 ;; share of broad money that exists as commercial bank deposits
+    :world-broad-money-usd 9.86e13 ;; ~$98.6T aggregated world broad money, early 2026
+    :us-m2-usd 2.30e13 ;; US M2, Q1 2026 (from $22.212T in Sept 2025)
+    :source "Bank of England Quarterly Bulletin 2014 Q1, 'Money creation in the modern economy' (ideas.repec.org/a/boe/qbullt/0128.html; summarized at positivemoney.org): bank deposits are 97% of broad money in circulation, and banks create them BY LENDING -- explicitly NOT by intermediating savers' deposits and explicitly NOT by multiplying up central bank reserves. World broad money ~$98.6T early 2026 (businesstats.com aggregation of central-bank M2 reporting); US M2 $23.0T Q1 2026 (macromicro.me / Fed H.6 series)"
+    :note "the loop that actually issues most of the world's money, and the direct structural rival to every 'labor-backed issuance' design. Its decisive advantage is not technology or trust -- it is that ISSUANCE IS A BYPRODUCT OF DEMAND: a borrower who wants money causes the money to exist, so supply auto-scales with demand with no separate bootstrap problem. A labor-backed unit inverts this (supply is capped by work performed, which is capped by demand for that work), which is why labor-backed and asset-backed units historically stay small unless a lender-of-last-resort is bolted on. Recording the mechanism precisely matters more than the aggregate: 'banks lend out deposits' is the folk model the BoE paper exists to refute."}
+
+   :central-bank-balance-sheet-expansion
+   {:cycle-time-days 45.6 ;; 365/8 -- eight scheduled policy meetings per year is the interval at which the loop can actually act
+    :self-funding-coefficient 1.0 ;; UNIQUE IN THIS CATALOG and the reason this entry was added: this loop's capacity to fund its next cycle is not constrained by its previous cycle's output AT ALL. Every other archetype here must earn, raise, or mint against something; a monetary authority issues the settlement asset itself. 1.0 is not "very good at self-funding", it is a structurally different category that the coefficient's [0,1] range can only approximate
+    :instrumentation-completeness 0.9 ;; balance sheet published weekly, one of the most transparent large systems in existence
+    :friction 0.0 ;; the counterparty performs no action to complete a cycle -- acceptance is legally mandated (legal tender), not solicited. Every other archetype must persuade someone to do something
+    :estimate? true ;; loop parameters are reasoned judgment over a documented mechanism; the balance-sheet and M2 figures are cited
+    :fed-balance-sheet-usd 6.5e12 ;; ~$6.5T, grown from ~$800B in 2005 (~6% -> ~21% of US GDP)
+    :major4-m2-usd 2.267e13 ;; combined M2 of the four major central banks, record high Feb 2026
+    :source "Fed balance sheet ~$6.5T in 2025, up from ~$800B in 2005, 6%->21% of GDP (mises.org 'Money-Supply Growth in 2026', citing Fed H.4.1); global major-4 central bank M2 at a record $22.667T as of Feb 2026 (ainvest.com flow analysis / macromicro.me series 28254); note the separate ~$98.6T figure is world-aggregate broad money, a different measure -- both retained on their respective entries rather than reconciled into one number"
+    :note "included because 'design a token economy' implicitly proposes a rival to THIS, and the rivalry is structurally lopsided in a way worth stating numerically rather than rhetorically. friction 0.0 + self-funding 1.0 is a combination no permissionless network can reproduce: crypto networks pay for security out of issuance (a real cost borne by holders via dilution), card networks pay for adoption out of interchange (a real cost borne by merchants), and both must persuade participants to opt in. A monetary authority does neither. The practical implication for any design in this workspace is that competing on 'better money' is competing on the loser's axis; competing on WHAT THE MONEY IS FOR (a settlement surface, a coordination unit, an audit trail) is not."}
+
+   :ethereum-network-fee-loop
+   {:cycle-time-days 1.3889e-4 ;; 12-second slot -- protocol constant, the interval at which fees are actually assessed and paid/burned
+    :self-funding-coefficient 0.75 ;; fees + protocol issuance pay validators, who secure the chain, which is what makes the chain worth transacting on -- a real loop, but issuance-subsidized rather than fully fee-funded
+    :instrumentation-completeness 0.98 ;; every fee, every address, every contract call is public and permanently queryable
+    :friction 0.35 ;; wallet + seed-phrase custody + gas denominated in a volatile asset -- low for a crypto-native, genuinely high for everyone else
+    :estimate? true ;; loop parameters are reasoned judgment; fee/transaction/address figures are cited
+    :annual-flow-usd 2.73e9 :flow-kind :fees-collected ;; highest of any chain
+    :daily-transactions 1.15e6 ;; ~1.1-1.2M/day late 2025; record 1.87M on 2025-12-31
+    :active-addresses 7.91e5 ;; ~791K, early 2026
+    :avg-fee-usd 0.21 ;; all-time low, down >50% YoY
+    :source "sqmagazine.co.uk / coinlaw.io Ethereum gas-fee statistics 2026 and DefiLlama chain page: $2.73B annual transaction fees (highest of any chain), ~1.1-1.2M tx/day late 2025 with a 1.87M record on 2025-12-31, ~791K active addresses early 2026, average fee at an all-time low ~$0.21 (some periods $0.15)"
+    :note "deliberately SEPARATE from :ethereum-developer-ecosystem-esp, whose own note already warns that it scores only the EF grants program and 'a low score here is not evidence Ethereum's growth engine is weak'. This entry is that missing engine. The number that matters for a fee-funded design: $2.73B/yr in fees across the single largest smart-contract network is roughly 1/7th of Visa's NET REVENUE alone ($40B) and ~1.4% of US card swipe fees ($198B) -- the whole of L1 crypto fee revenue is small next to the incumbent rail it is often described as displacing. Meanwhile average fee fell >50% YoY while transaction count hit records, i.e. the loop is scaling volume by giving up unit economics."}
+
+   :stablecoin-reserve-yield
+   {:cycle-time-days 1 ;; reserve interest accrues daily and mint/redeem is continuous
+    :self-funding-coefficient 0.95 ;; near-pure margin: reserve yield on T-bills funds the distribution and integration deals that bring in the next tranche of float, with essentially no marginal cost per unit issued
+    :instrumentation-completeness 0.9 ;; on-chain supply is exactly measured in real time; reserve composition attested monthly (attestation, not full audit -- see source)
+    :friction 0.15 ;; near-zero for a crypto-native holder; KYC/banking friction only at the fiat edges
+    :estimate? true ;; loop parameters are reasoned judgment; supply/reserve/profit figures are cited
+    :total-stablecoin-marketcap-usd 3.234e11 ;; May 2026
+    :usdt-supply-usd 1.8635e11 ;; 59.22% dominance
+    :usdc-supply-usd 7.7e10 ;; +28% YoY
+    :annual-flow-usd 2.15e13 :flow-kind :gross-volume-settled ;; USDC on-chain volume, +263% YoY, 12mo to 2026-03-31
+    :usdc-onchain-volume-usd 2.15e13 ;; same figure, kept under its explicit name
+    :issuer-annual-profit-usd 1.0e10 ;; Tether 2025 net profit at 4-5% on ~$187B reserves
+    :source "coinlaw.io stablecoin market-cap statistics 2026: total stablecoin market cap $323.411B (May 2026), USDT dominance 58.65-59.22% at $186.35B; Circle Transparency (May 2026 / Q1 FY2026): USDC $76.5-77.0B in circulation (+28% YoY) against $76.7B reserves, on-chain volume $21.5T (+263% YoY); Tether Q1 2026 attestation: $191.77B total assets, $8.23B net equity, ~81-83% T-bills plus $8-10B BTC; Tether 2025 net profit >$10B at 4-5% on reserves (spark.money / stablecoininsider.org)"
+    :note "the sphere this workspace's own junbi/準圏 rides on (ADR-2607995000: USDC on Base L2, etzhayyim junbi Safe custody), so its structural strength is inherited FREE by any design that settles in USDC rather than reproduced at cost. Two consequences worth stating: (1) a design that settles in USDC does not need to bootstrap monetary security at all -- it is buying $300B+ of it for zero marginal cost; (2) the issuer's business is not payments, it is a T-bill carry trade on someone else's float, which means the rail's economics are indifferent to whether your particular volume exists, i.e. it will neither help nor obstruct a small settlement surface built on top of it."}
+
+   :wir-bank-mutual-credit
+   {:cycle-time-days 30 ;; assumed comparable to Sardex's measured ~12x/yr circulation velocity -- see :estimate? and note; NOT independently measured for WIR in this pass
+    :self-funding-coefficient 0.35 ;; materially higher than :sardex-mutual-credit's 0.15 for a cited structural reason: WIR is a licensed cooperative BANK with a real balance sheet earning interest on WIR-denominated credit lines, so network operation is funded by the network's own lending, not by grants or membership fees alone
+    :instrumentation-completeness 0.7 ;; bank-grade statutory reporting plus decades of independent academic study (Stodder's macro-stability panel work), though not growth-funnel instrumentation
+    :friction 0.45 ;; cooperative membership plus per-member credit-line underwriting -- comparable to Sardex's vetting, not self-serve
+    :estimate? true ;; cycle-time and the 4 loop parameters are reasoned/assumed; participant and turnover figures are cited
+    :founded 1934
+    :annual-flow-chf 1.5e9 ;; "over 1.5 billion WIR exchanged annually, ~2% of Swiss GDP"
+    :member-smes 5.0e4 ;; 50,000 SMEs generating CHF1.43B turnover (2013 figure -- the most recent precise pairing found)
+    :source "monneta.org WIR Bank profile + theeconomyjournal.eu + currency.ggtrust.com: founded 1934, over CHF1.5B exchanged annually (~2% of Swiss GDP); 50,000 SMEs / CHF1.43B turnover in 2013 (most recent precisely-paired figure located); Jim Stodder, 'The Macro-Stability of Swiss WIR-Bank Credits' (jimstodder.com/WIR_Panel_CES.pdf) for the countercyclicality finding. NOTE: WIR Bank's own 2025 reporting (finews.com, thebanks.eu) is dominated by its conventional CHF banking and VIAC platform (~118,000 customers as at Jan 2025), which is NOT the same population as WIR-currency participants -- the two are deliberately not conflated here, and no 2025 WIR-currency participant count was located"
+    :note "THE existence proof this catalog previously lacked: a net-zero, non-redeemable, non-speculative mutual credit unit that has run continuously for 92 years at ~2% of a developed country's GDP. sardex-mutual-credit (2,900-4,000 businesses, EUR50M/yr) shows the model works; WIR shows how large it gets and how long it lasts. Also the source of the design's known failure mode: mutual credit dies of IMBALANCE (persistent net creditors with nothing to spend on), which is why WIR pairs the currency with a bank that can set per-member credit limits and actively broker trades -- the brokerage function is not an add-on, it is what keeps the loop from stalling. Stodder's finding that WIR volume rises when the Swiss franc economy contracts is the countercyclical property no speculative token has ever demonstrated."}
+
+   :holochain-holofuel-mutual-credit
+   {:cycle-time-days nil ;; the loop has never fired: HoloFuel is not live, 8+ years after funding -- see note
+    :self-funding-coefficient 0.05 ;; ICO-treasury-funded, not funded by network revenue; hosting revenue that would close the loop requires HoloFuel, which is the thing that has not shipped
+    :instrumentation-completeness 0.1 ;; no public host-count, hosting-revenue, or conversion metrics located in this pass
+    :friction 0.6 ;; self-hosted agent runtime plus wallet/identity setup
+    :estimate? true
+    :ico-raised-usd 2.0389e7 ;; March 2018, HOT at $0.0006
+    :years-since-funding 8 ;; March 2018 -> July 2026
+    :source "coinlore.com/coin/holo/ico-tokenomics + coincarp + tokize.com Holo review 2026: ICO completed March 2018 (sale ran to 2026-04-28... i.e. 2018-04-28), raising ~$20,389,000 at $0.0006/HOT. HOT is explicitly a PLACEHOLDER for HoloFuel, swappable 1:1 during a 6-month guaranteed swap window that has not yet been activated. Holo Hosting launched using HOT specifically BECAUSE 'the native cryptocurrency HoloFuel is not yet ready' (holo.host blog / buyholo.net 2025 roadmap); a large-scale HOT-to-HoloFuel migration TEST was run April-May 2026, still pre-mainnet"
+    :note "the single most directly relevant comparator for this workspace's own EN/ENGI design, which kotoba-lang/engi's README itself describes as 'exactly HoloFuel's model'. The finding is not that Holochain failed -- it is that a $20.4M-funded, decade-old, technically serious team building THE SAME mutual-credit architecture has not gotten the currency loop to fire in 8 years. Any EN roadmap that assumes a faster path than this needs to say explicitly what it is doing differently, and 'we will implement it correctly' is not an answer, because the gap here is not implementation. Sits in compare-archetypes' :unmeasured partition alongside etzhayyim-adherent-loop, cloud-murakumo-credits-current and engi-en-mutual-credit-current -- four never-fired loops, of which this is the one with the most resources and the most elapsed time."}
+
+   :engi-en-mutual-credit-current
+   {:cycle-time-days nil ;; zero EN transfers between any two non-operator agents; the loop has never fired
+    :self-funding-coefficient 0 ;; EN is net-zero and non-minted by construction, and witness duty is rewarded in credits, whose own loop has also never fired (:cloud-murakumo-credits-current)
+    :instrumentation-completeness 0 ;; EN transfer count is not instrumented at all -- unlike the x402 funnel, which was wired to kotobase.net /metrics on 2026-07-25 (adr-ledger seq 61)
+    :friction 0.85 ;; did:key generation + asynchronous counter-signing handshake + witness bonding that is literally impossible today because no escrow contract is deployed anywhere
+    :estimate? true
+    :en-transfers 0
+    :external-witnesses-bonded 0
+    :source "orgs/kotoba-lang/en README ('Deliberately NOT implemented': resolving engi.consensus blocks into the transfers vector is unimplemented, so no live replay exists); orgs/kotoba-lang/engi-witness-escrow README ('This is a local-test-only design exercise... not deployed to any real network... holds no real funds anywhere'); orgs/kotoba-lang/engi/docs/witness-recruitment.md ('As of this draft, no real escrow contract exists yet -- bonding is not actually possible today'), all read 2026-07-25; com-junkawasaki/root ADR-2607995000 honest-dependency ('decentralization of the zone is rate-limited by the zone's revenue')"
+    :note "added so this workspace's own EN sits in the same catalog, scored by the same formula, as the systems it is compared against -- rather than being described in prose while every rival is scored. Placed deliberately next to :holochain-holofuel-mutual-credit (same architecture, 8 years and $20.4M further along, also never fired) and :wir-bank-mutual-credit (same architecture, 92 years, ~2% of Swiss GDP, very much fired). The pair brackets the honest range of outcomes for this design: WIR proves the ceiling is real, Holochain proves the path there is not short, and neither ceiling nor path is a function of the cryptography."}})
+
+;; ---------------------------------------------------------------------------
+;; Second axis -- realized scale, kept separate from compounding speed
+;; ---------------------------------------------------------------------------
+
+(defn- spearman
+  "Rank correlation over paired numeric seqs. Ties get averaged ranks. Returned
+   so 'these two axes measure different things' can be a computed number rather
+   than an assertion. nil when fewer than 3 pairs."
+  [xs ys]
+  (when (<= 3 (count xs))
+    (let [rank (fn [v]
+                 ;; average rank per distinct value, so ties do not bias the correlation
+                 (let [avg (into {} (for [[val pairs] (group-by first (map-indexed (fn [i x] [x i]) (sort v)))]
+                                      [val (/ (reduce + (map second pairs)) (count pairs))]))]
+                   (mapv #(get avg %) v)))
+          rx (rank xs) ry (rank ys)
+          n (count xs)
+          mx (/ (reduce + rx) n) my (/ (reduce + ry) n)
+          num (reduce + (map (fn [a b] (* (- a mx) (- b my))) rx ry))
+          dx (Math/sqrt (reduce + (map #(let [d (- % mx)] (* d d)) rx)))
+          dy (Math/sqrt (reduce + (map #(let [d (- % my)] (* d d)) ry)))]
+      (when (and (pos? dx) (pos? dy)) (/ num (* dx dy))))))
+
+(defn compare-archetypes-2d
+  "Structural strength AND realized annual flow, reported as two axes that are
+   deliberately NOT collapsed into one score.
+
+   Why this exists (added 2026-07-25 alongside the incumbent money-system
+   comparators): `loop-structural-strength` answers exactly one question --
+   how fast does this loop compound -- and its value is dominated by
+   cycles-per-year. Ranked on that axis alone, a 12-second Ethereum slot beats
+   a quarterly bank capital cycle by ~5 orders of magnitude, which is a true
+   statement about compounding speed and a badly false one about which system
+   issues most of the world's money. Any reader who takes the one-axis ranking
+   as 'which system is bigger/stronger' is being misled by the model, so the
+   model now reports the second axis rather than relying on the reader to
+   remember the caveat.
+
+   Flow figures are NOT comparable across kinds. :annual-flow-usd in this
+   catalog has always mixed gross volume settled (Visa's $17T), fees collected
+   (Ethereum's $2.73B), operator revenue and total market size -- a latent unit
+   inconsistency that predates this function. Rather than silently rank across
+   them, entries are grouped by :flow-kind, and every entry that has a flow
+   figure but no declared kind lands in :unclassified-flow-kind, where it is
+   reported and not ranked. Adding :flow-kind to those entries is the fix; this
+   function makes the gap visible instead of averaging over it.
+
+   :speed-vs-scale-correlation is a Spearman rank correlation between strength
+   and flow, computed SEPARATELY WITHIN each flow-kind that has at least 3
+   entries -- deliberately not pooled across kinds, since pooling would be the
+   exact cross-unit ranking this function exists to refuse. Values far from
+   +/-1 mean speed does not predict scale within that kind, i.e. the two axes
+   carry independent information and collapsing them would lose some. Computed,
+   not assumed; with n=5 per kind these are directional, not conclusive."
+  ([] (compare-archetypes-2d loop-archetypes))
+  ([archetypes]
+   (let [rows (for [[k v] archetypes]
+                {:id k
+                 :strength (loop-structural-strength v)
+                 :annual-flow-usd (:annual-flow-usd v)
+                 :flow-kind (:flow-kind v)})
+         classified (filter (every-pred :flow-kind :annual-flow-usd :strength) rows)
+         by-kind (->> classified
+                      (group-by :flow-kind)
+                      (into {} (map (fn [[kind rs]]
+                                      [kind (sort-by :annual-flow-usd > rs)]))))]
+     {:by-flow-kind by-kind
+      :speed-vs-scale-correlation
+      (into {} (for [[kind rs] by-kind
+                     :let [c (spearman (mapv :strength rs) (mapv :annual-flow-usd rs))]
+                     :when c]
+                 [kind {:spearman c :n (count rs)}]))
+      :unclassified-flow-kind (->> rows
+                                   (filter #(and (:annual-flow-usd %) (nil? (:flow-kind %))))
+                                   (map :id)
+                                   sort
+                                   vec)
+      :no-flow-figure (->> rows (remove :annual-flow-usd) (map :id) sort vec)
+      :n-both-known (count classified)})))
 
 (defn compare-archetypes
   "Structural-strength ranking over every archetype with a numeric cycle time.
    Archetypes with cycle-time-days nil (never-fired loops) are returned
    separately under :unmeasured rather than silently dropped or scored as 0 --
-   that gap IS the finding, not noise to filter out."
+   that gap IS the finding, not noise to filter out.
+
+   This is the SPEED axis only. See `compare-archetypes-2d` before reading any
+   ranking here as a statement about size, importance, or realized scale."
   ([] (compare-archetypes loop-archetypes))
   ([archetypes]
    (let [scored (for [[k v] archetypes
