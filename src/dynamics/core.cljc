@@ -719,7 +719,76 @@
    Deliberately NOT exhaustive -- this is the set of moves large enough to
    change a loop parameter, not a policy chronology. Adding one is adding a
    map."
-  [{:date "2008-11-25" :institution :federal-reserve :jurisdiction :us
+  [;; ── before 2008: where the loop's parameters actually came from ──────────
+   ;;
+   ;; The first version of this catalog started at QE1 (2008) and therefore
+   ;; implied that unbounded self-funding was a 2008 invention. It is not. The
+   ;; constraint that had bounded it for centuries was removed in 1971, and the
+   ;; institutional form that made the loop possible at all was built in 1694.
+   ;; A model that starts in 2008 mistakes a symptom for a cause.
+
+   {:date "1694-07-27" :institution :bank-of-england :jurisdiction :uk
+    :event "Bank of England chartered"
+    :changed :self-funding-coefficient
+    :detail "The first institution to hold a state's account and issue notes against it -- the organisational form every entry below inherits. Included as the origin of the archetype, not as a measured parameter change."
+    :estimate? true
+    :source "Bank of England Act 1694 (Royal Charter, 27 July 1694). Well documented; no primary source was fetched in this pass, so this entry is marked estimate?"}
+
+   {:date "1913-12-23" :institution :federal-reserve :jurisdiction :us
+    :event "Federal Reserve Act signed"
+    :changed :friction
+    :detail "Created a lender of last resort for the US after the 1907 panic. The relevant loop effect is on friction: a banking system with a backstop faces a lower cost of continuing to lend through a shock than one without."
+    :estimate? true
+    :source "Federal Reserve Act, signed 1913-12-23. Well documented; no primary source fetched in this pass"}
+
+   {:date "1944-07" :institution :bretton-woods-system :jurisdiction :global
+    :event "Bretton Woods agreement"
+    :changed :self-funding-coefficient
+    :detail "Dollar convertible to gold at a fixed rate, other currencies pegged to the dollar. This is the BOUND: an authority that must deliver gold on demand cannot fund its next cycle without limit, so self-funding was materially below 1.0 for every entry under this system."
+    :estimate? true
+    :source "Bretton Woods conference, July 1944; end-of-system account via ehs.org.uk 'Ending Bretton Woods' and IMF blog 'From the History Books' (2021)"}
+
+   {:date "1971-08-15" :institution :federal-reserve :jurisdiction :global
+    :event "Nixon shock -- dollar/gold convertibility suspended"
+    :changed :self-funding-coefficient
+    :detail "THE parameter change this whole catalog turns on. Nixon unilaterally suspended convertibility of the dollar into gold, ending Bretton Woods; by 1973 major currencies floated. Before this date a monetary authority's ability to fund its next cycle was bounded by a commodity it had to deliver on demand. After it, the bound was removed -- which is what makes self-funding-coefficient 1.0 a property of the CLASS rather than a description of post-2008 emergency policy. QE is a symptom of a constraint removed 37 years earlier, not the removal itself."
+    :source "Nixon address, 1971-08-15, suspending direct international convertibility of the dollar to gold, alongside wage/price freeze and import surcharge; Smithsonian realignment later that year failed and major currencies floated by 1973 (ehs.org.uk 'Ending Bretton Woods'; IMF blog 2021-08-16; firstonline.info 2021 50th-anniversary account)"}
+
+   {:date "1979-10-06" :institution :federal-reserve :jurisdiction :us
+    :event "Volcker shift to monetary targeting"
+    :changed :instrumentation-completeness
+    :detail "The Fed switched from targeting the federal funds RATE to targeting monetary AGGREGATES, accepting whatever rate followed. The mirror image of BOJ's 2016 move from a quantity target to a price target -- the same instrument, run in the opposite direction, 37 years apart."
+    :estimate? true
+    :source "FOMC 1979-10-06 ('Saturday Night Special'). Well documented; no primary source fetched in this pass"}
+
+   {:date "1985-09-22" :institution :g5 :jurisdiction :global
+    :event "Plaza Accord"
+    :changed :friction
+    :detail "Coordinated intervention to depreciate the dollar. Included because it is the clearest pre-euro case of monetary authorities acting as a BLOC rather than individually -- the same coordination the euro area later made permanent by construction."
+    :estimate? true
+    :source "Plaza Hotel meeting of G5 finance ministers, 1985-09-22. Well documented; no primary source fetched in this pass"}
+
+   {:date "1999-01-01" :institution :ecb :jurisdiction :euro-area
+    :event "Euro introduced; monetary policy transferred to the ECB"
+    :changed :stock-flow-structure
+    :detail "Eleven national money-creation loops were replaced by one. This is why the World Bank reports NO national broad money for euro-area members (measured 2026-07-25: Germany, France, Italy, Spain, Netherlands, Belgium, Austria, Portugal, Greece, Ireland and Finland all absent) -- in a currency union money creation stops being a national fact. A per-country model structurally cannot see the euro area, which is a property of the system, not a data gap."
+    :estimate? true
+    :source "ECB assumed responsibility for euro-area monetary policy 1999-01-01 (ECB established 1998-06-01). The absent-national-data observation is measured: kotoba-lang/loop-system-dynamics money-loop-analysis, World Bank FM.LBL.BMNY.CN, 2026-07-25"}
+
+   {:date "1999-02-12" :institution :bank-of-japan :jurisdiction :japan
+    :event "Zero interest rate policy"
+    :changed :friction
+    :detail "The policy rate reached its conventional floor. Everything after it in this catalog -- QE, QQE, YCC -- exists because the price instrument had run out, which is the structural reason quantity instruments were reached for at all."
+    :estimate? true
+    :source "BOJ ZIRP from February 1999, maintained through 2000 (San Francisco Fed Economic Letter 2001/11; NBER w10878 'Two Decades of Japanese Monetary Policy')"}
+
+   {:date "2001-03-19" :institution :bank-of-japan :jurisdiction :japan
+    :event "First quantitative easing anywhere"
+    :changed :self-funding-coefficient
+    :detail "The BOJ targeted commercial banks' current account balances FAR above required reserves -- roughly JPY1T up to a JPY5T target -- pushing the call rate from 0.15% to near zero, and committed to hold until core CPI was stably at or above 0%. Lifted March 2006. Predates the Fed's QE1 by more than seven years: the instrument the 2008 entries treat as novel was invented in Tokyo and run for five years first."
+    :source "San Francisco Fed Economic Letter 2001-11 'Quantitative Easing by the Bank of Japan' and 2006-10 'Did Quantitative Easing by the Bank of Japan Work?'; IMF WP/12/02; BOJ 'Evolving Monetary Policy: The Bank of Japan's Experience' (2017)"}
+
+   {:date "2008-11-25" :institution :federal-reserve :jurisdiction :us
     :event "QE1 announced"
     :changed :self-funding-coefficient
     :detail "$100B agency debt + $500B agency MBS announced; by its March 2010 end the Fed had bought $1.25T MBS, $175B agency debt, $300B Treasuries. The moment central bank asset purchase stopped being an emergency liquidity operation and became a standing balance-sheet instrument."
