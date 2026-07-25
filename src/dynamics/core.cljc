@@ -539,7 +539,8 @@
    ;; -------------------------------------------------------------------------
 
    :fed-balance-sheet
-   {:cycle-time-days 45.6 ;; 365/8 scheduled FOMC meetings
+   {:names-institution? true :institution :federal-reserve :jurisdiction :us
+    :cycle-time-days 45.6 ;; 365/8 scheduled FOMC meetings
     :self-funding-coefficient 1.0
     :instrumentation-completeness 0.95 ;; H.4.1 published weekly
     :friction 0.0
@@ -551,7 +552,8 @@
     :note "the asymmetry is the finding, and it is measured rather than asserted: a three-year deliberate reversal undid roughly half of one expansion. Any design reasoning about 'the money printer' as a symmetric instrument is reasoning about something that has not happened."}
 
    :bank-of-japan-balance-sheet
-   {:cycle-time-days 45.6 ;; 8 Monetary Policy Meetings/yr
+   {:names-institution? true :institution :bank-of-japan :jurisdiction :japan
+    :cycle-time-days 45.6 ;; 8 Monetary Policy Meetings/yr
     :self-funding-coefficient 1.0
     :instrumentation-completeness 0.95
     :friction 0.0
@@ -564,7 +566,8 @@
     :note "the longest-running and most extreme version of this loop, and the only one that has run a PRICE target (YCC, 2016-09 to 2024-03) rather than a quantity target. A central bank committing to a price must buy whatever quantity defends it -- self-funding unbounded by construction. It is also the only major central bank whose exit is scheduled to stop at a permanent large purchase floor (JPY2T/month from 2027-04) rather than at zero."}
 
    :ecb-balance-sheet
-   {:cycle-time-days 45.6 ;; 8 monetary policy meetings/yr
+   {:names-institution? true :institution :ecb :jurisdiction :euro-area
+    :cycle-time-days 45.6 ;; 8 monetary policy meetings/yr
     :self-funding-coefficient 1.0
     :instrumentation-completeness 0.9
     :friction 0.0
@@ -575,7 +578,8 @@
     :note "the only one of the four whose most consequential move cost nothing to execute: the July 2012 'whatever it takes' commitment is widely credited with ending the acute sovereign crisis without a single OMT purchase. A loop parameter changed with zero flow, which no quantity-based model of this system can represent."}
 
    :pboc-directed-credit-creation
-   {:cycle-time-days 30 ;; Loan Prime Rate is set monthly; window guidance is continuous
+   {:names-institution? true :institution :pboc :jurisdiction :china
+    :cycle-time-days 30 ;; Loan Prime Rate is set monthly; window guidance is continuous
     :self-funding-coefficient 1.0
     :instrumentation-completeness 0.85 ;; monthly aggregates published; window guidance is not
     :friction 0.05 ;; a directed loan is not solicited from the bank's side the way a Western credit application is
@@ -590,7 +594,8 @@
     :note "THE LARGEST MONEY-CREATION LOOP ON EARTH, and the catalog did not contain it until now. At 6.774 CNY/USD, China's M2 is ~$52.7T against US M2 of ~$23.0T -- roughly 2.3x. The mechanism also differs in kind from the other three: the binding constraint on Chinese bank credit creation is administrative (loan quotas, window guidance, TSF targets) rather than the price of money, which is why its cycle time is monthly rather than tied to a policy-meeting calendar. Any analysis that treats 'central banking' as the Fed plus three footnotes has mis-identified the largest actor in the system it is analysing."}
 
    :us-commercial-bank-credit-creation
-   {:cycle-time-days 90 ;; quarterly capital/earnings cycle
+   {:jurisdiction :us
+    :cycle-time-days 90 ;; quarterly capital/earnings cycle
     :self-funding-coefficient 0.8
     :instrumentation-completeness 0.95
     :friction 0.4
@@ -823,6 +828,85 @@
                    :institutions (into #{} (map :institution) es)
                    :jurisdictions (into #{} (map :jurisdiction) es)
                    :dates (mapv :date (sort-by :date es))}]))))
+
+;; ---------------------------------------------------------------------------
+;; Coverage against a real denominator (added 2026-07-25)
+;; ---------------------------------------------------------------------------
+
+(def money-system-universe
+  "How many money-creating institutions actually exist, with citations.
+
+   Why this is here: this namespace's own header says no entity is categorically
+   out of scope and that what is finite is which entities have been fed real
+   data, not which the model can represent. That is only an honest claim if the
+   DENOMINATOR is stated. Otherwise 'we model central banking' reads as
+   coverage when it is four institutions.
+
+   Asked directly on 2026-07-25 whether every central bank and every bank in
+   every country was coded and analysed, the answer was no, and these are the
+   numbers that make the no precise."
+  {:bis-member-central-banks
+   {:count 63
+    :source "BIS: membership comprises 63 national central banks and monetary authorities (bis.org Annual Report 2025/26 and governance pages; figure stable across 2023-2026 reporting)"
+    :note "the major authorities, NOT all of them -- BIS membership is by invitation and many monetary authorities are not members"}
+
+   :world-bank-economies
+   {:count 217
+    :source "World Bank country list (api.worldbank.org/v2/country), entries whose :region is not 'NA' (i.e. excluding the 78 aggregate rows), fetched 2026-07-25"
+    :note "the practical universe of jurisdictions with an identifiable monetary system. Not identical to 'countries' in any political sense; it is the denominator the money data below is actually reported against"}
+
+   :economies-with-broad-money-data
+   {:count 125
+    :as-of "2023"
+    :source "World Bank indicator FM.LBL.BMNY.CN (Broad money, current LCU), date=2023, fetched 2026-07-25: 125 real economies returned a non-nil value (115 for 2024, 133 for 2022 -- later years are less complete because reporting lags)"
+    :note "the real ceiling on systematic coverage from this source. The gap from 217 is not modelling scope, it is missing data -- some economies do not report, and the most recent year is always the least complete"}
+
+   :commercial-banks-worldwide
+   {:count :not-measured
+    :source nil
+    :note "deliberately left unmeasured rather than estimated. Counts in the tens of thousands are widely repeated but definitions differ enormously (holding company vs charter vs branch; credit unions and cooperatives in or out), and a number invented here would be exactly the fabricated global total this namespace's header forbids. What CAN be said without a count: this catalog contains ZERO individually-modelled commercial banks, and models the sector as an aggregate mechanism per jurisdiction instead"}})
+
+(defn money-system-coverage
+  "What fraction of the money system this catalog actually covers, computed
+   from the catalog itself against `money-system-universe`.
+
+   `extra-jurisdictions` lets a caller add jurisdictions covered by ingested
+   data that does not live in `loop-archetypes` (e.g. the World Bank broad-money
+   pull in kotoba-lang/loop-system-dynamics) so coverage can be reported for the
+   whole system rather than for this one file.
+
+   Returns absolute counts alongside every ratio. A ratio without its numerator
+   invites reading 3% as 'nearly there' or 'hopeless' depending on mood; the
+   counts do not."
+  ([] (money-system-coverage loop-archetypes #{}))
+  ([archetypes extra-jurisdictions]
+   (let [named-institutions (into #{} (comp (filter (fn [[_ v]] (:names-institution? v)))
+                                            (map key))
+                                  archetypes)
+         jurisdictions (into (set extra-jurisdictions)
+                             (keep (fn [[_ v]] (:jurisdiction v)))
+                             archetypes)
+         bis (get-in money-system-universe [:bis-member-central-banks :count])
+         econ (get-in money-system-universe [:world-bank-economies :count])
+         with-data (get-in money-system-universe [:economies-with-broad-money-data :count])
+         ratio (fn [n d] (when (pos? d) (double (/ n d))))]
+     {:named-institutions (vec (sort named-institutions))
+      :named-institution-count (count named-institutions)
+      :jurisdictions (vec (sort jurisdictions))
+      :jurisdiction-count (count jurisdictions)
+      :central-bank-coverage {:covered (count named-institutions)
+                              :of bis
+                              :ratio (ratio (count named-institutions) bis)
+                              :denominator-source (get-in money-system-universe
+                                                          [:bis-member-central-banks :source])}
+      :jurisdiction-coverage {:covered (count jurisdictions)
+                              :of econ
+                              :ratio (ratio (count jurisdictions) econ)
+                              :attainable-with-current-sources with-data
+                              :attainable-ratio (ratio with-data econ)}
+      :individual-commercial-banks {:covered 0
+                                    :of :not-measured
+                                    :note "modelled as a per-jurisdiction aggregate mechanism, never as individual institutions"}})))
 
 (defn compare-archetypes
   "Structural-strength ranking over every archetype with a numeric cycle time.
