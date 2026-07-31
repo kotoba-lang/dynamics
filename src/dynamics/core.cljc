@@ -482,7 +482,17 @@
     :daily-transactions 1.15e6 ;; ~1.1-1.2M/day late 2025; record 1.87M on 2025-12-31
     :active-addresses 7.91e5 ;; ~791K, early 2026
     :avg-fee-usd 0.21 ;; all-time low, down >50% YoY
-    :source "sqmagazine.co.uk / coinlaw.io Ethereum gas-fee statistics 2026 and DefiLlama chain page: $2.73B annual transaction fees (highest of any chain), ~1.1-1.2M tx/day late 2025 with a 1.87M record on 2025-12-31, ~791K active addresses early 2026, average fee at an all-time low ~$0.21 (some periods $0.15)"
+    ;; Value-accrual triple, added 2026-07-31 on the same source/date as the rest
+    ;; of the cohort so Ethereum can be ranked beside them rather than described.
+    :fees-1y-usd 2.52932414e8
+    :revenue-1y-usd 8.7584205e7
+    :holders-revenue-1y-usd 8.7584205e7
+    :holders-share-of-fees 0.346
+    :market-cap-usd 2.2997e11
+    :mcap-per-holders-revenue 2626
+    :value-accrual :eip1559-base-fee-burn
+    :fee-figure-discrepancy "The :annual-flow-usd 2.73e9 above and the :fees-1y-usd 2.53e8 added here differ by ~10.8x and are BOTH retained deliberately. They are not the same measurement: the $2.73B is a 2026 secondary-source citation of a higher-fee period, the $253M is the DefiLlama trailing-1y series read 2026-07-31 on the same basis as every other cohort entry. Overwriting the older figure would have destroyed the evidence that fee-based valuations of this chain vary by an order of magnitude depending on the window chosen -- which is itself the finding most relevant to anyone sizing a fee-capture design. Use :fees-1y-usd for cross-entry comparison and :annual-flow-usd only with its own source's period."
+    :source "sqmagazine.co.uk / coinlaw.io Ethereum gas-fee statistics 2026 and DefiLlama chain page: $2.73B annual transaction fees (highest of any chain), ~1.1-1.2M tx/day late 2025 with a 1.87M record on 2025-12-31, ~791K active addresses early 2026, average fee at an all-time low ~$0.21 (some periods $0.15). Value-accrual triple from DefiLlama /overview/fees (dailyFees / dailyRevenue / dailyHoldersRevenue, trailing 1y, read 2026-07-31): fees $252,932,414, revenue $87,584,205, holders revenue $87,584,205 = 34.6%; CoinGecko markets 2026-07-31T06:09:30Z: ETH $1,905.59, market cap $229.97B, circulating 120.68M, fully diluted"
     :note "deliberately SEPARATE from :ethereum-developer-ecosystem-esp, whose own note already warns that it scores only the EF grants program and 'a low score here is not evidence Ethereum's growth engine is weak'. This entry is that missing engine. The number that matters for a fee-funded design: $2.73B/yr in fees across the single largest smart-contract network is roughly 1/7th of Visa's NET REVENUE alone ($40B) and ~1.4% of US card swipe fees ($198B) -- the whole of L1 crypto fee revenue is small next to the incumbent rail it is often described as displacing. Meanwhile average fee fell >50% YoY while transaction count hit records, i.e. the loop is scaling volume by giving up unit economics."}
 
    :stablecoin-reserve-yield
@@ -613,7 +623,176 @@
     :en-transfers 0
     :external-witnesses-bonded 0
     :source "orgs/kotoba-lang/en README ('Deliberately NOT implemented': resolving engi.consensus blocks into the transfers vector is unimplemented, so no live replay exists); orgs/kotoba-lang/engi-witness-escrow README ('This is a local-test-only design exercise... not deployed to any real network... holds no real funds anywhere'); orgs/kotoba-lang/engi/docs/witness-recruitment.md ('As of this draft, no real escrow contract exists yet -- bonding is not actually possible today'), all read 2026-07-25; com-junkawasaki/root ADR-2607995000 honest-dependency ('decentralization of the zone is rate-limited by the zone's revenue')"
-    :note "added so this workspace's own EN sits in the same catalog, scored by the same formula, as the systems it is compared against -- rather than being described in prose while every rival is scored. Placed deliberately next to :holochain-holofuel-mutual-credit (same architecture, 8 years and $20.4M further along, also never fired) and :wir-bank-mutual-credit (same architecture, 92 years, ~2% of Swiss GDP, very much fired). The pair brackets the honest range of outcomes for this design: WIR proves the ceiling is real, Holochain proves the path there is not short, and neither ceiling nor path is a function of the cryptography."}})
+    :note "added so this workspace's own EN sits in the same catalog, scored by the same formula, as the systems it is compared against -- rather than being described in prose while every rival is scored. Placed deliberately next to :holochain-holofuel-mutual-credit (same architecture, 8 years and $20.4M further along, also never fired) and :wir-bank-mutual-credit (same architecture, 92 years, ~2% of Swiss GDP, very much fired). The pair brackets the honest range of outcomes for this design: WIR proves the ceiling is real, Holochain proves the path there is not short, and neither ceiling nor path is a function of the cryptography."}
+
+   ;; -------------------------------------------------------------------------
+   ;; Value-accrual cohort (added 2026-07-31, owner question: "analyse and
+   ;; compare ethereum, tron, solana, hyperliquid, monero, uniswap, icp, render,
+   ;; filecoin, gnosis"). Every entry below carries the SAME measured triple --
+   ;; :fees-1y-usd (what users actually paid), :holders-revenue-1y-usd (what
+   ;; actually reached token holders) and :holders-share-of-fees -- so the
+   ;; question "does the operator keep the transaction fee, or does the token
+   ;; capture it?" is answered by a ratio rather than by a mechanism story.
+   ;;
+   ;; All three come from one source read on one date (DefiLlama /overview/fees
+   ;; dataTypes dailyFees, dailyRevenue, dailyHoldersRevenue, trailing 1y, read
+   ;; 2026-07-31), and market cap / FDV / supply from the CoinGecko /coins/
+   ;; markets snapshot timestamped 2026-07-31T06:09:30Z. Mixing sources across
+   ;; entries would make the ratios incomparable, which is the whole point of
+   ;; the cohort. The four loop parameters remain reasoned judgment
+   ;; (:estimate? true); only the money figures are measurements.
+   ;;
+   ;; :mcap-per-holders-revenue is a PRICE/ACCRUAL multiple, not a valuation
+   ;; claim. It is included because the design question it informs -- "can this
+   ;; be made investable?" -- is otherwise argued from mechanism alone, and
+   ;; mechanism does not distinguish a 16x from a 2,600x.
+   ;; -------------------------------------------------------------------------
+
+   :tron-fee-burn-loop
+   {:cycle-time-days 3.472e-5 ;; ~3s block
+    :self-funding-coefficient 0.7
+    :instrumentation-completeness 0.95
+    :friction 0.25 ;; the cheapest widely-used USDT transfer rail; that IS its product
+    :estimate? true
+    :fees-1y-usd 3.98202438e8
+    :revenue-1y-usd 3.98202438e8
+    :holders-revenue-1y-usd 3.98202438e8
+    :holders-share-of-fees 1.0
+    :market-cap-usd 3.118e10
+    :mcap-per-holders-revenue 78
+    :value-accrual :fee-burn
+    :source "DefiLlama /overview/fees (dailyFees / dailyRevenue / dailyHoldersRevenue, trailing 1y, read 2026-07-31): fees $398,202,438, revenue $398,202,438, holders revenue $398,202,438 -- a 100% pass-through, the only chain in this cohort where the three figures are identical. CoinGecko markets snapshot 2026-07-31T06:09:30Z: TRX $0.3286, market cap $31.18B, circulating 94.89B, FDV $31.18B (essentially fully diluted)"
+    :note "the highest fee-to-holder pass-through in the catalog and the lowest price multiple of any large chain here (~78x vs Ethereum's ~2,600x). Worth stating plainly because it cuts against taste: the chain most often dismissed as uninteresting is the one whose token most completely captures what its users pay. The mechanism is not clever -- it is that Tron sells one commodity (stablecoin transfers) at scale and burns the proceeds, with no L2 ecosystem to leak fees into. A design that wants fee capture should study this before studying Ethereum, whose 34.6% is the product of deliberately exporting activity to rollups."}
+
+   :solana-fee-loop
+   {:cycle-time-days 4.63e-6 ;; ~400ms slot
+    :self-funding-coefficient 0.75
+    :instrumentation-completeness 0.95
+    :friction 0.3
+    :estimate? true
+    :fees-1y-usd 2.73429369e8
+    :revenue-1y-usd 3.2261855e7
+    :holders-revenue-1y-usd 3.2261855e7
+    :holders-share-of-fees 0.118
+    :market-cap-usd 4.306e10
+    :fdv-usd 4.690e10
+    :mcap-per-holders-revenue 1335
+    :value-accrual :partial-fee-burn-rest-to-validators
+    :source "DefiLlama /overview/fees (trailing 1y, read 2026-07-31): fees $273,429,369, revenue $32,261,855, holders revenue $32,261,855 = 11.8% of fees. CoinGecko 2026-07-31T06:09:30Z: SOL $74.30, market cap $43.06B, circulating 579.6M, total supply 631.2M, FDV $46.90B"
+    :note "near-identical gross fees to Ethereum ($273M vs $253M) and roughly one third of Ethereum's holder accrual, because most of what a Solana user pays is priority fee routed to the validator rather than burned. The comparison to :tron-fee-burn-loop is the useful one: Tron collects 1.46x Solana's fees and passes 12.3x as much to holders. Gross throughput and token accrual are close to independent -- a design cannot infer one from the other."}
+
+   :hyperliquid-assistance-fund-buyback
+   {:cycle-time-days 1.16e-5 ;; ~1s block; buyback executes continuously against fee inflow
+    :self-funding-coefficient 0.85 ;; fees buy the token, the token pays market makers and stakers, who supply the liquidity that earns the next fee
+    :instrumentation-completeness 0.95
+    :friction 0.4 ;; requires bridging plus derivatives literacy
+    :estimate? true
+    :fees-1y-usd 1.020698432e9 ;; Perps $968,672,076 + Spot Orderbook $52,026,356
+    :holders-revenue-1y-usd 7.7920321e8 ;; Perps $740,288,475 + Spot $38,914,735
+    :holders-share-of-fees 0.763
+    :market-cap-usd 1.2314767e10
+    :fdv-usd 5.5351652e10
+    :mcap-per-holders-revenue 15.8
+    :fdv-per-holders-revenue 71
+    :value-accrual :open-market-buyback
+    :source "DefiLlama /overview/fees (trailing 1y, read 2026-07-31): Hyperliquid Perps fees $968,672,076 / holders revenue $740,288,475 (76.4%); Hyperliquid Spot Orderbook fees $52,026,356 / holders revenue $38,914,735 (74.8%). CoinGecko 2026-07-31T06:09:30Z: HYPE $55.36, market cap $12.31B, circulating 222.4M of 1.0B max, FDV $55.35B"
+    :note "the strongest fee-capture engine in this cohort in absolute terms -- $779M/yr reaching holders, more than Ethereum, Solana, Tron, Uniswap, ICP, Render, Filecoin, Gnosis and Monero COMBINED ($550M) -- and by circulating market cap the cheapest at ~16x. Two cautions that must travel with that number: (1) the multiple on FDV is ~71x, and only 22% of supply circulates, so the gap between the two is a scheduled future dilution, not an accounting artifact; (2) the fee base is perpetual-futures trading volume, which is the most cyclical revenue in crypto -- this is a trailing-year figure from a venue, not an annuity. Structurally it is the clearest existing proof that a token CAN be made investable by fee capture alone, without an issuance narrative, which is the exact claim a burn-sink design rests on."}
+
+   :monero-no-fee-capture
+   {:cycle-time-days 1.389e-3 ;; 2-minute block
+    :self-funding-coefficient 0.7 ;; fees + tail emission pay miners, whose hashrate is the privacy guarantee that is the product
+    :instrumentation-completeness 0.2 ;; deliberately the lowest in the catalog: amounts, senders and receivers are cryptographically hidden BY DESIGN, so per-user funnel measurement is not merely absent but forbidden by the product
+    :friction 0.6 ;; broad exchange delistings push acquisition to atomic swaps and P2P
+    :estimate? true
+    :fees-1y-usd 1.381204e6
+    :holders-revenue-1y-usd 0
+    :holders-share-of-fees 0.0
+    :market-cap-usd 6.65e9
+    :value-accrual :none-by-design
+    :source "DefiLlama /overview/fees (trailing 1y, read 2026-07-31): fees $1,381,204, revenue $0 -- fees go to miners, nothing is burned or routed to holders. CoinGecko 2026-07-31T06:09:30Z: XMR $353.78, market cap $6.65B, circulating 18.8M, no max supply (tail emission)"
+    :note "the control case, and it is the one that most damages a naive 'value accrual makes a token valuable' story: Monero captures ZERO fees for holders, has a perpetual tail emission (i.e. permanent dilution rather than any burn), sustains $6.65B of market cap -- 9x Render, 11x Filecoin, 24x Gnosis, all of which DO have burn or accrual mechanisms -- and is priced above every DePIN network in this cohort. Its value comes from a use nobody else supplies at all, not from a claim on cash flow. The design lesson for a compute network is uncomfortable but specific: the accrual mechanism is a multiplier on demand, never a substitute for it, and a monopoly on a real use outperforms a well-engineered sink on a commodity use. Note also that its instrumentation score is low for an honourable reason -- a system whose product is unobservability cannot be measured by the funnels this catalog otherwise rewards, so its low compounding score should not be read as weakness."}
+
+   :uniswap-lp-fee-no-protocol-capture
+   {:cycle-time-days 1.3889e-4 ;; per-block on Ethereum
+    :self-funding-coefficient 0.9 ;; fees -> LPs -> deeper liquidity -> better execution -> more volume: one of the tightest real loops in the catalog. It just does not run through the token
+    :instrumentation-completeness 0.98
+    :friction 0.35
+    :estimate? true
+    :fees-1y-usd 8.50354034e8 ;; V2 $97,994,278 + V3 $489,722,541 + V4 $262,637,215
+    :holders-revenue-1y-usd 2.8324614e7 ;; V2 $794,805 + V3 $27,529,809 + V4 $0
+    :holders-share-of-fees 0.033
+    :market-cap-usd 2.82e9
+    :fdv-usd 4.02e9
+    :mcap-per-holders-revenue 100
+    :value-accrual :mostly-none-fees-go-to-liquidity-providers
+    :source "DefiLlama /overview/fees (trailing 1y, read 2026-07-31): Uniswap V2 fees $97,994,278 / holders $794,805; V3 fees $489,722,541 / holders $27,529,809; V4 fees $262,637,215 / holders $0. Separately 'Uniswap Labs' (Developer Tools category) fees $20,401,794 -- the front-end interface fee, which is COMPANY revenue and not token accrual. CoinGecko 2026-07-31T06:09:30Z: UNI $4.51, market cap $2.82B, circulating 624.9M of 1.0B max, FDV $4.02B"
+    :note "the sharpest available demonstration that a thriving protocol and an accruing token are separate facts. $850M/yr of fees pass through Uniswap; 3.3% reaches UNI holders and the newest version routes 0%. The fees are not lost -- they go to liquidity providers, who are the supply side, exactly as murakumo credits go to fleet nodes. The structural parallel is direct and worth stating: a design that pays its suppliers out of user fees has, by that same act, decided its token is not the residual claimant. Note also the separately-measured $20.4M of Uniswap Labs interface fees: when a protocol declines to charge at the protocol layer, the operating company can still charge at the interface layer, and that revenue belongs to the company, not the holders. Any workspace weighing 'operator keeps the fee' against 'token captures the fee' should read this line as the priced version of that choice."}
+
+   :internet-computer-cycles-burn
+   {:cycle-time-days 1.16e-5 ;; ~1s finality
+    :self-funding-coefficient 0.5 ;; cycles burn on compute, but node providers are paid by fresh issuance rather than by the burn
+    :instrumentation-completeness 0.9
+    :friction 0.5 ;; a bespoke canister/cycles model rather than the EVM tooling most developers already own
+    :estimate? true
+    :fees-1y-usd 2.067984e6
+    :revenue-1y-usd 2.603904e6
+    :holders-revenue-1y-usd 2.603904e6
+    :holders-share-of-fees 1.259 ;; >1: holders revenue EXCEEDS reported fees. Recorded as measured; see :caveat
+    :caveat "DefiLlama reports holders revenue ($2,603,904) ABOVE fees ($2,067,984) for ICP, a ratio of 1.259 that cannot be a pass-through share of a fee. Most likely the two series are built from different burn/consumption accounting rather than from a split of one fee pool. Recorded as measured and flagged, NOT clamped to 1.0 -- clamping would have hidden the one entry in the cohort whose two figures are not commensurable, and ADR-2607259800's methodology rule is that an anomaly is reported, never normalised away. (The first draft of this entry did clamp it to 1.0; the consistency test added alongside the cohort caught it.)"
+    :market-cap-usd 1.15e9
+    :value-accrual :cycles-burn
+    :source "DefiLlama /overview/fees (trailing 1y, read 2026-07-31): fees $2,067,984, revenue $2,603,904, holders revenue $2,603,904. CoinGecko 2026-07-31T06:09:30Z: ICP $2.07, market cap $1.15B, circulating 555.2M, no max supply"
+    :note "the cautionary entry for any 'burn the token to pay for compute' design, which is precisely the shape of a compute-credit sink. ICP has shipped that mechanism, at scale, for years -- and it produces $2.6M/yr of burn against a $1.15B market cap (~442x). The burn is real and the mechanism works as specified; it is simply small, because burn is a function of compute demand and compute demand is what is actually hard. This is the closest large-cap precedent to a Murakumo-style 'pay for inference, burn the token' sink, and its measured size is the honest prior for one."}
+
+   :filecoin-storage-collateral-burn
+   {:cycle-time-days 3.472e-4 ;; 30s epoch
+    :self-funding-coefficient 0.5
+    :instrumentation-completeness 0.9
+    :friction 0.6 ;; storage providers must post collateral and face slashing before earning anything
+    :estimate? true
+    :fees-1y-usd 2.44666e6
+    :revenue-1y-usd 2.44666e6
+    :holders-revenue-1y-usd 2.44666e6
+    :holders-share-of-fees 1.0
+    :market-cap-usd 5.8e8
+    :fdv-usd 1.40e9
+    :mcap-per-holders-revenue 237
+    :value-accrual :fee-burn-plus-provider-collateral-lockup
+    :source "DefiLlama /overview/fees (trailing 1y, read 2026-07-31): fees $2,446,660, revenue $2,446,660, holders revenue $2,446,660 (100% pass-through). CoinGecko 2026-07-31T06:09:30Z: FIL $0.7159, market cap $580M, circulating 810.3M, FDV $1.40B"
+    :note "the DePIN network that most closely matches a compute marketplace's two-sided structure -- suppliers post collateral (the design this workspace calls a witness bond) and user fees are burned -- and it clears $2.4M/yr of fees at a $580M market cap. Together with :internet-computer-cycles-burn ($2.6M) and :render-network-bme-burn-mint ($2.3M), it establishes a tight and sobering band: three of the most mature, best-funded, most-cited decentralized-compute/storage economies each capture roughly $2-3M/yr for holders. That band, not Ethereum's $88M or Hyperliquid's $779M, is the realistic comparator for a GPU-inference token, and the FDV/mcap gap (2.4x) is the scheduled dilution any such design inherits when it pays suppliers in its own unit."}
+
+   :gnosis-chain-fee-loop
+   {:cycle-time-days 5.787e-5 ;; ~5s block
+    :self-funding-coefficient 0.3
+    :instrumentation-completeness 0.9
+    :friction 0.45
+    :estimate? true
+    :fees-1y-usd 1.23093e5
+    :revenue-1y-usd 0
+    :holders-revenue-1y-usd 0
+    :holders-share-of-fees 0.0
+    :market-cap-usd 2.8e8
+    :fdv-usd 3.2e8
+    :value-accrual :none-measured
+    :source "DefiLlama /overview/fees (trailing 1y, read 2026-07-31): fees $123,093, revenue $0, holders revenue $0. CoinGecko 2026-07-31T06:09:30Z: GNO $105.88, market cap $280M, circulating 2.6M of 3.0M max, FDV $320M"
+    :note "the smallest fee base in the cohort by two orders of magnitude ($123K/yr, i.e. ~$337/day) with zero measured holder accrual, yet $280M of market cap. Kept in the catalog precisely because it is unflattering to the mechanism-first view: the ratio of market cap to captured fees here is effectively undefined, which means the price is supported by something this table does not measure -- treasury assets, governance option value, a fixed 3M supply cap, or simply belief. A design document that argues 'we will add a burn and therefore the token will be worth something' should be required to explain Gnosis and Monero, both of which are worth substantially more than Render, Filecoin and ICP while capturing less or nothing."}
+
+   :render-network-bme-burn-mint
+   {:cycle-time-days 1 ;; the burn-mint accounting cycle, distinct from job latency
+    :self-funding-coefficient 0.6 ;; burned user payments mint the tokens that pay node operators, whose capacity serves the next job
+    :instrumentation-completeness 0.85
+    :friction 0.5
+    :estimate? true
+    :fees-1y-usd 2.276301e6
+    :revenue-1y-usd 2.276301e6
+    :holders-revenue-1y-usd 2.16248e6
+    :holders-share-of-fees 0.95
+    :market-cap-usd 7.3e8
+    :fdv-usd 7.5e8
+    :mcap-per-holders-revenue 337
+    :value-accrual :burn-mint-equilibrium
+    :source "DefiLlama /overview/fees, protocol 'Render Network BME', category DePIN (trailing 1y, read 2026-07-31): fees $2,276,301, revenue $2,276,301, holders revenue $2,162,480 (95.0%). CoinGecko 2026-07-31T06:09:30Z: RENDER $1.40, market cap $730M, circulating 518.8M of 644.2M max, FDV $750M"
+    :note "deliberately SEPARATE from :render-network-gpu-marketplace, which scores Render's growth/partnership loop and carries no fee measurement. This entry is the money. It matters more than its size suggests because Burn-Mint Equilibrium is the exact mechanism com-junkawasaki/root ADR-2607299900 sink (a) proposes to adopt: users pay, the received token is burned, node operators are minted new supply. The measured result of running that mechanism, on a live network with real GPU demand, an eight-year-old brand and a Blender Foundation channel, is $2.28M/yr of fees with 95% reaching holders and a $730M market cap. Any plan that adopts BME should carry this number as its base rate: BME is a well-behaved distribution mechanism, and it distributed $2.3M."}})
 
 ;; ---------------------------------------------------------------------------
 ;; Second axis -- realized scale, kept separate from compounding speed
