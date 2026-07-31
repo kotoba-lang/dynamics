@@ -50,7 +50,54 @@
     (let [{:keys [ranked unmeasured]} (d/compare-archetypes)]
       (is (some #{:etzhayyim-adherent-loop} unmeasured))
       (is (not (some #(= :etzhayyim-adherent-loop (first %)) ranked)))
-      (is (= :speculative-crypto-derivatives (ffirst ranked))))))
+      ;; Previously this asserted a specific archetype was rank 1
+      ;; (:speculative-crypto-derivatives). That is a fact about which entries
+      ;; happen to be IN the catalog, not about the partitioning behaviour this
+      ;; test is named for, so it broke the moment a faster loop was added
+      ;; (:solana-fee-loop, 400ms slot vs the derivative desk's ~1 day). The
+      ;; catalog's own docstring promises "adding an archetype is adding a map",
+      ;; so a test that fails on a legitimate addition is testing the wrong
+      ;; thing. Assert the ordering invariant instead, which is what :ranked
+      ;; actually guarantees.
+      (is (seq ranked))
+      (let [scores (map second ranked)]
+        (is (every? number? scores))
+        (is (= scores (reverse (sort scores))))))))
+
+(deftest value-accrual-cohort-triple-is-internally-consistent-test
+  (testing "every value-accrual entry carries fees, holders revenue, a share that
+            matches them, and a dated source -- so 'who captures the fee' is a
+            measurement rather than a mechanism story"
+    (let [cohort (into {} (filter (fn [[_ v]] (contains? v :holders-share-of-fees))
+                                  d/loop-archetypes))]
+      ;; 9 added 2026-07-31 for the owner's crypto comparison, plus the triple
+      ;; retrofitted onto the pre-existing :ethereum-network-fee-loop
+      (is (= 10 (count cohort)))
+      (doseq [[id v] cohort]
+        (testing (str id)
+          (is (number? (:fees-1y-usd v)))
+          (is (number? (:holders-revenue-1y-usd v)))
+          (is (string? (:source v)))
+          ;; every figure in this cohort comes from one source read on one date;
+          ;; mixing dates would make the ratios incomparable
+          (is (re-find #"2026-07-31" (:source v)))
+          ;; the share must be recomputable from the two measurements it summarises
+          (let [{:keys [fees-1y-usd holders-revenue-1y-usd holders-share-of-fees]} v]
+            (when (pos? fees-1y-usd)
+              (is (< (Math/abs (- holders-share-of-fees
+                                  (/ holders-revenue-1y-usd fees-1y-usd)))
+                     0.01)
+                  "stated share must match measured fees/holders-revenue")))))
+      ;; ICP is the one entry where holders revenue EXCEEDS fees; it must say so
+      ;; in-band rather than be silently clamped to <=1 (methodology rule from
+      ;; ADR-2607259800: report the anomaly, do not normalise it away)
+      (let [icp (:internet-computer-cycles-burn d/loop-archetypes)]
+        (is (string? (:caveat icp)))
+        (is (> (:holders-revenue-1y-usd icp) (:fees-1y-usd icp))))
+      ;; the control cases: zero accrual is 0, never nil, never absent
+      (doseq [id [:monero-no-fee-capture :gnosis-chain-fee-loop]]
+        (is (zero? (:holders-revenue-1y-usd (id d/loop-archetypes))))
+        (is (zero? (:holders-share-of-fees (id d/loop-archetypes))))))))
 
 (deftest jehovahs-witnesses-archetype-has-real-sourced-figures-test
   (testing "the JW archetype carries dated, sourced, real published figures -- not estimates"
