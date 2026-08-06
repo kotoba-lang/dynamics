@@ -415,6 +415,71 @@
     :note "real usage exists and is instrumented (funnel/cost tracked in canvas-ledger.edn), but the paid-conversion event has zero occurrences to date -- structurally identical in kind to etzhayyim-adherent-loop's 'never fired', not a worse or better case, just equally honest about what has not yet been measured. Added alongside the 2026-07 crypto/decentralized-compute comparators (bitcoin-pow-mining through io-net-gpu-aggregation above) as part of ADR-2607203000-style comparative analysis for cloud-murakumo's own growth-loop design"}
 
    ;; -------------------------------------------------------------------------
+   ;; This workspace's OWN monetisation loops (added 2026-08-06).
+   ;;
+   ;; Why these three exist. The catalog already held every incumbent and
+   ;; crypto comparator anyone could want, plus exactly ONE entry for a loop
+   ;; owned here (:cloud-murakumo-credits-current). So the question "how does
+   ;; OUR fee model convert into growth?" could be asked of Visa and of Tron
+   ;; but not of x402, kotobase or itonami -- the three products whose revenue
+   ;; streams the portfolio's own canvases describe as take-rate, subscription
+   ;; and per-seat/per-run. The comparison was one-sided by omission.
+   ;;
+   ;; All three score cycle-time-days nil (loop-structural-strength returns
+   ;; nil, never 0) because none has produced the output that would fund its
+   ;; next input. That is the same verdict :cloud-murakumo-credits-current
+   ;; already carries, and it is the honest one -- but the three zeroes have
+   ;; THREE DIFFERENT CAUSES, which is the finding worth recording and the
+   ;; reason they are separate entries rather than one:
+   ;;
+   ;;   x402      the settle leg is REJECTING: 3 submissions, 3 rejections,
+   ;;             0 settlements. The counterparty tried. This is a wiring
+   ;;             result. It is also 0 by POLICY -- internal sellers are free
+   ;;             by design, so the take rate is 0 and a settled payment would
+   ;;             still fund nothing.
+   ;;   kotobase  the signup leg FIRED (0 -> 12) and checkout is 0/12. The
+   ;;             loop advanced one stage and stopped at the next.
+   ;;   itonami   checkout is verified live end-to-end and 5 external tenants
+   ;;             have never opened it. Nothing is broken; nobody is buying.
+   ;;
+   ;; A single portfolio-level "conversion = 0" hides all three. Repairing a
+   ;; rejecting facilitator, a checkout page and a contact path are different
+   ;; jobs, and only the first is an engineering job.
+   ;; -------------------------------------------------------------------------
+
+   :nexus-x402-facilitator-take-rate-current
+   {:cycle-time-days nil ;; one cycle would be a settlement; there has never been one
+    :self-funding-coefficient 0 ;; TWO independent reasons, and separating them matters: (a) no settlement has occurred, and (b) the take rate on internal sellers is deliberately 0 -- so even a settled payment funds nothing. Compare :visa-card-network-interchange 0.9, where the fee IS the mechanism that buys the next transaction
+    :instrumentation-completeness 0.9 ;; the best-instrumented loop owned here: challenge, submission, rejection, settlement, per-seller attribution and an agent-vs-human hint are all counted per request in SETTLEMENTS_KV
+    :friction 0.85 ;; USDC on Base + wallet + an EIP-3009-style signed authorization, and empirically 3 of 3 submissions were rejected -- measured friction, not assumed
+    :estimate? true ;; the four loop parameters are reasoned judgment; every count below is measured
+    :annual-flow-usd 0 :flow-kind :gross-volume-settled ;; deliberately present rather than omitted: this is what "sits on the same axis as Visa's $17T" actually looks like today
+    :sellers-registered 4
+    :challenges-observed 14 :submissions-observed 3 :rejections-observed 3 :settlements-observed 0
+    :source "90-docs/business/metrics/nexus-x402.edn as-of 2026-08-06: catalog count 4 (murakumo /x402/v1/messages $0.01, kotobase /x402/ipfs/ $0.001, kotobase /x402/xrpc/ $0.002, shinshi /x402/premium/ $0.50, all USDC on Base), settlements {:count 0 :usd-total 0 :agent-hint {:agent 0 :human 0 :unknown 0}}, workers 1480 inv/7d, health 200. Payment-intent legs from 90-docs/business/metrics/net-kotobase.edn as-of 2026-08-06: :x402 {:challenges 14 :submissions 3 :rejections 3 :settlements 0 :attempt-rate 0.214 :settlement-rate 0}. Facilitator deployed 2026-07-10 (nexus-x402-business-model.edn), so 27 days observed"
+    :note "the only loop in this catalog whose zero is NOT a demand zero. 14 challenges produced 3 submissions -- someone, or some agent, actually attempted to pay -- and all 3 were rejected, giving a 100% rejection rate on every payment ever submitted to this facilitator. Read the two upper bounds together and the ambiguity is the point: 0 settlements in 3 submissions bounds the settle rate at 63.2% (upper-bound-rate-from-zero-events n=3), which is to say the submission-level data is almost uninformative, while 0 in 14 challenges bounds the end-to-end rate at 19.3%. Neither is a forecast. What IS determinate is the 3/3 rejection, and that is an engineering defect, not a market signal -- it is the one zero in this whole catalog that could plausibly be repaired without persuading anybody of anything. The second fact is structural and easy to miss while chasing the first: the take rate on internal sellers is 0 by design (nexus-x402-business-model.edn: 'the point is eliminating duplicate payment gates'), so this loop cannot self-fund at ANY settlement volume until an external seller exists or the internal rate stops being 0. Fixing the rejections makes payments work; it does not make the loop compound"}
+
+   :net-kotobase-subscription-current
+   {:cycle-time-days nil ;; one cycle would be a paid workspace funding acquisition of the next; there has never been a paid workspace
+    :self-funding-coefficient 0
+    :instrumentation-completeness 0.85 ;; visitors/signups/checkouts are attributed BY SOURCE (organic vs openai-ads), and the x402 legs are counted separately -- the most complete funnel of the three products here
+    :friction 0.5 ;; developer-facing self-serve signup then Stripe checkout; no wallet, no ceremony
+    :estimate? true
+    :funnel-visitors 2292 :funnel-signups 12 :funnel-checkouts 0 :paid-workspaces 0
+    :source "90-docs/business/metrics/net-kotobase.edn as-of 2026-08-06: 54,777 req/7d, 1,210 uniques/7d (daily sum), funnel {:visitors 2292 :signups 12 :checkouts 0}, by-source {:visitors {:openai-ads 3 :organic 760} :signups {:organic 9}}, stripe {:active-subscriptions 0}. NOTE on two Stripe fields that must not be misread as this product's revenue: :active-subscriptions-account-wide 2 and :charges-total 90 are ACCOUNT-wide, and :last-charge-epoch 1604224274 dates the most recent of those charges to 2020-11-01 -- five years before this product existed"
+    :note "the first of the three to move a leg: signups went 0 -> 3 -> 12 across the 2026-07/08 observations while checkouts stayed 0. That makes it the only one whose failing stage is now precisely located -- 0 of 12 signups opened checkout, bounding the signup->checkout rate at 22.1% (upper-bound-rate-from-zero-events n=12). Also worth recording because it is the one paid-channel datum in the entire portfolio: 3 of 2,292 visitors came from openai-ads and 0 of them signed up, which is not evidence that the channel fails -- it is 3 visitors, and the honest reading is that no paid channel has been tested at a volume that could produce evidence either way"}
+
+   :cloud-itonami-saas-current
+   {:cycle-time-days nil ;; one cycle would be a paying org funding acquisition of the next; there has never been a paying org
+    :self-funding-coefficient 0
+    :instrumentation-completeness 0.8 ;; the product publishes its own live billing-readiness at /api/billing/status and its own funnel at /api/fleet/metrics, so the zero is self-reported by the system under test rather than inferred from outside
+    :friction 0.55 ;; WebAuthn passkey ceremony to claim the free path, then Stripe Checkout
+    :estimate? true
+    :external-tenants 5 :paying-orgs 0 :agent-runs-7d 1012
+    :source "90-docs/business/metrics/cloud-itonami.edn as-of 2026-08-06T01:12:10Z: 25,574 req/7d, 321 uniques/7d (daily sum), agentRuns7d 1012, funnel {:trials 5 :freeClaims 5 :externalTenants 5 :paid 0}, tenants {:external-total 5 :external-paid 0 :selfRegisteredOwners 5}, stripe {:activeSubscriptions 0 :customerBindings 0 :secretsConfigured true}"
+    :note "the cleanest of the three zeroes and therefore the most expensive: checkout is verified live end-to-end (secrets configured, webhook ready, mode live -- the product's own status API says so), five external tenants exist and self-registered, and none has ever started a purchase. Nothing is mis-wired and nobody is being asked. 0 of 5 bounds the tenant->paying rate at 45.1% (upper-bound-rate-from-zero-events n=5), which is a large upper bound precisely because 5 trials is almost no evidence -- the correct reading is 'this has not been tested', not 'this fails'. Note the shape of the traffic: 1,012 agent runs against 321 human uniques means the substrate is being exercised mostly by agents, and agents do not open Stripe Checkout"}
+
+   ;; -------------------------------------------------------------------------
    ;; Incumbent money-system comparators (added 2026-07-25).
    ;;
    ;; The catalog previously held crypto/DePIN networks and one mutual-credit

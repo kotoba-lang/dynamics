@@ -49,6 +49,40 @@ guessed value when a loop's cycle time has never actually been observed.
 ;;     :unmeasured [:etzhayyim-adherent-loop]}
 ```
 
+## This workspace's own loops are in the catalog too (2026-08-06)
+
+`loop-archetypes` is not only a set of external comparators. Four entries are
+loops owned by this workspace, cited to dated files under
+`90-docs/business/metrics/`:
+
+| entry | one cycle would be | strength |
+|---|---|---|
+| `:nexus-x402-facilitator-take-rate-current` | a settlement | `nil` |
+| `:net-kotobase-subscription-current` | a paid workspace | `nil` |
+| `:cloud-itonami-saas-current` | a paying org | `nil` |
+| `:cloud-murakumo-credits-current` | a credits purchase | `nil` |
+
+All four are `nil` rather than a low number, because
+`loop-structural-strength` refuses to compute a cycle time that has never been
+observed. **The four nils do not have the same cause**, and the entries are
+kept separate so that the difference survives:
+
+- **x402** — the settle leg is *rejecting*: 3 submissions, 3 rejections,
+  0 settlements. A wiring result, not a demand result. Separately, its take
+  rate on internal sellers is 0 *by design*, so repairing the rejections would
+  make payments work without making the loop compound.
+- **kotobase** — the signup leg fired (0 → 12); checkout is 0/12. The loop
+  advanced one stage and stopped at the next.
+- **itonami** — checkout is verified live end to end and 5 external tenants
+  have never opened it. Nothing is broken; nobody is buying.
+
+Each note quotes a 95% upper bound from `upper-bound-rate-from-zero-events`,
+and `own-loops-upper-bounds-are-computed-not-asserted-test` recomputes every
+quoted figure so the prose cannot drift from the function that produced it.
+Read those bounds as *how little has been tested* — 0 of 5 bounds the rate at
+45.1% because 5 trials is almost no evidence, not because the product is
+half-likely to convert.
+
 ## Real simulation and structural modeling: `dynamics.xmile` / `dynamics.sysml`
 
 **Correction (2026-07-21):** `kotoba-lang/org-oasis-open-xmile` (OASIS XMILE
