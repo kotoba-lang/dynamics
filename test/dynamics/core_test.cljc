@@ -487,4 +487,29 @@
       (is (zero? (:annual-flow-usd x)))
       (is (= :gross-volume-settled (:flow-kind x)))
       (is (= (:flow-kind x) (:flow-kind visa))
-          "same flow kind means compare-archetypes-2d will place them on the same axis, which is the whole point of recording a zero flow rather than omitting it"))))
+          "declaring the kind now means the day a settlement happens it lands on Visa's axis rather than being classified after the fact"))))
+
+(deftest a-flow-figure-with-an-unfired-loop-is-reported-not-dropped-test
+  (testing "an entry with a flow figure AND a flow kind but a nil strength used
+            to match none of compare-archetypes-2d's partitions and was reported
+            nowhere. A function whose purpose is to refuse misleading rankings
+            must not drop rows silently"
+    (let [{:keys [by-flow-kind unclassified-flow-kind no-flow-figure
+                  flow-known-strength-unmeasured]} (d/compare-archetypes-2d)
+          k :nexus-x402-facilitator-take-rate-current
+          ranked-ids (into #{} (comp (mapcat val) (map :id)) by-flow-kind)]
+      (is (not (contains? ranked-ids k))
+          "it must NOT be ranked -- ranking needs a strength and this loop has never fired")
+      (is (not (some #{k} unclassified-flow-kind)) "it has a flow kind")
+      (is (not (some #{k} no-flow-figure)) "it has a flow figure (0 is a figure)")
+      (is (some #{k} flow-known-strength-unmeasured)
+          "so it must appear here, or it appears nowhere at all")))
+  (testing "every archetype lands in exactly one of the four partitions"
+    (let [{:keys [by-flow-kind unclassified-flow-kind no-flow-figure
+                  flow-known-strength-unmeasured]} (d/compare-archetypes-2d)
+          ranked-ids (into #{} (comp (mapcat val) (map :id)) by-flow-kind)
+          all (concat ranked-ids unclassified-flow-kind no-flow-figure
+                      flow-known-strength-unmeasured)]
+      (is (= (count all) (count (set all))) "partitions must not overlap")
+      (is (= (set (keys d/loop-archetypes)) (set all))
+          "partitions must cover the whole catalog -- any archetype missing here is one the 2D view silently drops"))))
