@@ -398,3 +398,93 @@
       (is (<= 10 (:count sf)))
       (is (= "1260s" (first (:dates sf))))
       (is (contains? (:institutions sf) :yuan-government)))))
+
+;; ---------------------------------------------------------------------------
+;; This workspace's own monetisation loops (added 2026-08-06).
+;;
+;; The point of these entries is NOT that they score badly -- a never-fired
+;; loop scoring nil is the library working as designed. It is that the three
+;; nils have three different causes, and a portfolio-level "conversion = 0"
+;; erases that. These tests exist so a later edit cannot quietly collapse
+;; them back into one number.
+;; ---------------------------------------------------------------------------
+
+(deftest own-monetisation-loops-present-and-sourced-test
+  (testing "each loop owned here carries a citation to a dated metrics file"
+    (doseq [k [:nexus-x402-facilitator-take-rate-current
+               :net-kotobase-subscription-current
+               :cloud-itonami-saas-current
+               :cloud-murakumo-credits-current]]
+      (is (contains? d/loop-archetypes k) (str k " missing from the catalog"))
+      (is (re-find #"90-docs/business/metrics/" (:source (k d/loop-archetypes)))
+          (str k " must cite a real metrics file, not prose"))
+      (is (re-find #"2026-0[78]" (:source (k d/loop-archetypes)))
+          (str k " must carry the as-of date of the measurement"))))
+  (testing "all four score nil, never 0 -- none has produced the output that would
+            fund its next input, and a guessed cycle time would be fiction"
+    (doseq [k [:nexus-x402-facilitator-take-rate-current
+               :net-kotobase-subscription-current
+               :cloud-itonami-saas-current
+               :cloud-murakumo-credits-current]]
+      (is (nil? (d/loop-structural-strength (k d/loop-archetypes))) (str k " must be nil"))
+      (is (zero? (:self-funding-coefficient (k d/loop-archetypes))))))
+  (testing "and they appear in compare-archetypes' :unmeasured partition rather
+            than being ranked at the bottom of the measured one"
+    (let [{:keys [unmeasured]} (d/compare-archetypes)]
+      (doseq [k [:nexus-x402-facilitator-take-rate-current
+                 :net-kotobase-subscription-current
+                 :cloud-itonami-saas-current]]
+        (is (some #{k} unmeasured) (str k " must not be ranked as if measured"))))))
+
+(deftest three-zeroes-three-causes-test
+  (testing "x402's zero is a WIRING result: the counterparty submitted and was
+            rejected every time. This is the only zero here that could be
+            repaired without persuading anyone of anything"
+    (let [x (:nexus-x402-facilitator-take-rate-current d/loop-archetypes)]
+      (is (pos? (:submissions-observed x)) "someone actually tried to pay")
+      (is (= (:submissions-observed x) (:rejections-observed x))
+          "every submission ever made was rejected -- if this stops being true, rewrite the note")
+      (is (zero? (:settlements-observed x)))))
+  (testing "kotobase's zero is a STAGE result: the signup leg fired, the next did not"
+    (let [k (:net-kotobase-subscription-current d/loop-archetypes)]
+      (is (pos? (:funnel-signups k)) "the signup leg has fired")
+      (is (zero? (:funnel-checkouts k)) "the checkout leg has not")))
+  (testing "itonami's zero is a DEMAND result: nothing is mis-wired, nobody bought"
+    (let [i (:cloud-itonami-saas-current d/loop-archetypes)]
+      (is (pos? (:external-tenants i)))
+      (is (zero? (:paying-orgs i)))
+      (is (> (:agent-runs-7d i) (:external-tenants i))
+          "the substrate is exercised by agents, and agents do not open Stripe Checkout"))))
+
+(deftest own-loops-upper-bounds-are-computed-not-asserted-test
+  (testing "each note quotes a 95% upper bound; recompute them here so the prose
+            cannot drift away from the function that produced it"
+    (let [round2 (fn [x] (/ (Math/round (* 1000.0 x)) 10.0))] ;; -> percent, 1 decimal
+      ;; x402: 0 settlements in 3 submissions -- almost uninformative
+      (is (= 63.2 (round2 (d/upper-bound-rate-from-zero-events 3))))
+      ;; x402 end-to-end: 0 settlements in 14 challenges
+      (is (= 19.3 (round2 (d/upper-bound-rate-from-zero-events 14))))
+      ;; kotobase: 0 checkouts in 12 signups
+      (is (= 22.1 (round2 (d/upper-bound-rate-from-zero-events 12))))
+      ;; itonami: 0 paying in 5 external tenants
+      (is (= 45.1 (round2 (d/upper-bound-rate-from-zero-events 5))))))
+  (testing "a larger trial count is a tighter bound -- the bound is a statement
+            about how much has been tested, not about how well it works"
+    (is (> (d/upper-bound-rate-from-zero-events 3)
+           (d/upper-bound-rate-from-zero-events 12)
+           (d/upper-bound-rate-from-zero-events 14)))))
+
+(deftest take-rate-loop-cannot-self-fund-even-if-it-settled-test
+  (testing "x402's self-funding coefficient is 0 for a POLICY reason on top of the
+            demand reason: internal sellers are free by design, so fixing the
+            rejections makes payments work without making the loop compound.
+            Visa is the contrast that makes this legible -- there the fee IS the
+            thing that buys the next transaction"
+    (let [x (:nexus-x402-facilitator-take-rate-current d/loop-archetypes)
+          visa (:visa-card-network-interchange d/loop-archetypes)]
+      (is (zero? (:self-funding-coefficient x)))
+      (is (= 0.9 (:self-funding-coefficient visa)))
+      (is (zero? (:annual-flow-usd x)))
+      (is (= :gross-volume-settled (:flow-kind x)))
+      (is (= (:flow-kind x) (:flow-kind visa))
+          "same flow kind means compare-archetypes-2d will place them on the same axis, which is the whole point of recording a zero flow rather than omitting it"))))
