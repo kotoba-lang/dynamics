@@ -453,7 +453,7 @@
     :instrumentation-completeness 0.9 ;; the best-instrumented loop owned here: challenge, submission, rejection, settlement, per-seller attribution and an agent-vs-human hint are all counted per request in SETTLEMENTS_KV
     :friction 0.85 ;; USDC on Base + wallet + an EIP-3009-style signed authorization, and empirically 3 of 3 submissions were rejected -- measured friction, not assumed
     :estimate? true ;; the four loop parameters are reasoned judgment; every count below is measured
-    :annual-flow-usd 0 :flow-kind :gross-volume-settled ;; deliberately present rather than omitted: this is what "sits on the same axis as Visa's $17T" actually looks like today
+    :annual-flow-usd 0 :flow-kind :gross-volume-settled ;; deliberately present rather than omitted. It does NOT appear in compare-archetypes-2d's :by-flow-kind today -- that partition needs a strength, and this loop's is nil -- it appears in :flow-known-strength-unmeasured, the partition added on 2026-08-06 precisely because this entry was otherwise dropped from every list. Declaring the kind now means the day a settlement happens it lands on Visa's axis rather than needing to be classified after the fact
     :sellers-registered 4
     :challenges-observed 14 :submissions-observed 3 :rejections-observed 3 :settlements-observed 0
     :source "90-docs/business/metrics/nexus-x402.edn as-of 2026-08-06: catalog count 4 (murakumo /x402/v1/messages $0.01, kotobase /x402/ipfs/ $0.001, kotobase /x402/xrpc/ $0.002, shinshi /x402/premium/ $0.50, all USDC on Base), settlements {:count 0 :usd-total 0 :agent-hint {:agent 0 :human 0 :unknown 0}}, workers 1480 inv/7d, health 200. Payment-intent legs from 90-docs/business/metrics/net-kotobase.edn as-of 2026-08-06: :x402 {:challenges 14 :submissions 3 :rejections 3 :settlements 0 :attempt-rate 0.214 :settlement-rate 0}. Facilitator deployed 2026-07-10 (nexus-x402-business-model.edn), so 27 days observed"
@@ -937,6 +937,22 @@
                                    sort
                                    vec)
       :no-flow-figure (->> rows (remove :annual-flow-usd) (map :id) sort vec)
+      ;; An entry that HAS a flow figure and a flow kind but whose strength is
+      ;; nil (its loop has never fired) matched none of the three partitions
+      ;; above and was reported nowhere -- it fell out of :by-flow-kind for the
+      ;; nil strength, out of :unclassified-flow-kind for having a kind, and
+      ;; out of :no-flow-figure for having a figure. Found 2026-08-06 when
+      ;; :nexus-x402-facilitator-take-rate-current (flow 0, kind
+      ;; :gross-volume-settled, strength nil) vanished from every list. A
+      ;; function whose purpose is to refuse misleading rankings must not drop
+      ;; rows silently, so the partition is named rather than the entry
+      ;; excluded.
+      :flow-known-strength-unmeasured
+      (->> rows
+           (filter #(and (:annual-flow-usd %) (:flow-kind %) (nil? (:strength %))))
+           (map :id)
+           sort
+           vec)
       :n-both-known (count classified)})))
 
 ;; ---------------------------------------------------------------------------
