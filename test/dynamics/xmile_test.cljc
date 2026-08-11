@@ -127,3 +127,99 @@
           rate-2 (- (get-in projected [:checkpoints 2]) (get-in projected [:checkpoints 1]))
           rate-3 (- (get-in projected [:checkpoints 3]) (get-in projected [:checkpoints 2]))]
       (is (> rate-1 rate-2 rate-3)))))
+
+(def kotoba-network-base-params
+  {:name "kotoba-network-effect-base"
+   ;; Observed 2026-08-11 starting stocks/assets. Independent means outside
+   ;; the owner/operator; owned repos never count as external participants.
+   :initial-independent-developers 0
+   :owned-capability-providers 57
+   :initial-independent-providers 0
+   :owned-reusable-components 465
+   :initial-independent-components 0
+   :initial-active-organizations 5
+   :initial-independent-nodes 0
+   :operator-nodes 10
+   :initial-verified-receipts 0
+   ;; Named base-scenario assumptions, not measured rates.
+   :developer-market 10000
+   :organization-market 1000
+   :node-market 1000
+   :external-developer-rate 5
+   :developer-network-coefficient 0.05
+   :provider-productivity 0.1
+   :component-productivity 0.25
+   :external-organization-rate 1
+   :stack-network-coefficient 0.03
+   :external-node-rate 0.5
+   :node-demand-coefficient 0.05
+   :receipts-per-organization 52
+   :receipts-per-node 500
+   :provider-scale 100
+   :component-scale 1000
+   :receipt-scale 10000
+   :node-scale 100
+   :complement-value-weight 0.5
+   :technical-base-units 50
+   :provider-barrier-weight 1
+   :component-barrier-weight 0.1
+   :receipt-barrier-weight 0.001
+   :organization-barrier-weight 5
+   :node-barrier-weight 3
+   :entrant-replication-throughput 25
+   :entrant-cost-per-unit 100000
+   :fixed-technical-cost 3000000
+   :sim-years 10})
+
+(deftest network-effect-barrier-model-requires-explicit-honest-inputs-test
+  (testing "missing scenario coefficients fail closed instead of silently gaining defaults"
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+                          #"missing required parameters"
+                          (dx/network-effect-barrier-model xmile-ns {:name "incomplete"}))))
+  (testing "zero replication throughput is invalid because catch-up time would be undefined"
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+                          #"must be positive"
+                          (dx/network-effect-barrier-model
+                           xmile-ns (assoc kotoba-network-base-params
+                                           :entrant-replication-throughput 0))))))
+
+(deftest network-effect-barrier-model-is-valid-xmile-and-separates-owned-assets-test
+  (let [built (dx/network-effect-barrier-model xmile-ns kotoba-network-base-params)]
+    (is (validate/valid? (validate/validate built)))
+    (let [result (execute/run built)]
+      ;; No independent developer/provider/node is invented at t=0.
+      (is (zero? (first (get-in result [:xmile/series "Independent_Developers"]))))
+      (is (zero? (first (get-in result [:xmile/series "Independent_Providers"]))))
+      (is (zero? (first (get-in result [:xmile/series "Independent_Compute_Nodes"]))))
+      ;; Observed owned complements still count as replication work:
+      ;; 50 + 57 + .1*465 + 5*5 + 3*10 = 208.5 equivalent units.
+      (is (= 208.5 (first (get-in result [:xmile/series "Barrier_Asset_Units"]))))
+      (is (= 4.17 (first (get-in result [:xmile/series "Entry_Barrier_Index"]))))
+      (is (= 8.34 (first (get-in result [:xmile/series "Entrant_Catchup_Years"]))))
+      (is (= 23850000.0 (first (get-in result [:xmile/series "Entrant_Catchup_Cost"]))))
+      ;; Owned complements are ecosystem assets, not an independent network.
+      (is (> (first (get-in result [:xmile/series "Kotoba_Ecosystem_Value_Multiplier"])) 1))
+      (is (= 1.0 (first (get-in result [:xmile/series "Kotoba_Independent_Network_Value_Multiplier"])))))))
+
+(deftest network-effect-summary-computes-uplift-against-zero-feedback-test
+  (let [network (dx/network-effect-barrier-model xmile-ns kotoba-network-base-params)
+        no-network (dx/network-effect-barrier-model
+                    xmile-ns
+                    (assoc kotoba-network-base-params
+                           :name "kotoba-no-network-counterfactual"
+                           :developer-network-coefficient 0
+                           :stack-network-coefficient 0
+                           :node-demand-coefficient 0))
+        summary (dx/network-effect-summary execute/run network no-network [0 5 10])
+        y10 (get-in summary [:checkpoints 10])]
+    (is (zero? (get-in summary [:checkpoints 0 :developer-uplift])))
+    (is (zero? (get-in summary [:checkpoints 0 :organization-uplift])))
+    (is (> (:developer-uplift y10) 0))
+    (is (> (:developer-uplift-ratio y10) 1))
+    (is (> (:organization-uplift y10) 0))
+    (is (> (:organization-uplift-ratio y10) 1))
+    (is (> (:kotoba-ecosystem-value-multiplier y10) 1))
+    (is (> (:kotoba-independent-network-value-multiplier y10) 1))
+    (is (> (:new-entrant-catchup-years y10)
+           (get-in summary [:checkpoints 0 :new-entrant-catchup-years])))
+    (is (> (:entry-barrier-index y10) 1))))
