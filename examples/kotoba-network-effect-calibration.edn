@@ -1,0 +1,38 @@
+{:calibration/id :kotoba-network-effect-observation-boundary
+ :calibration/as-of "2026-08-11"
+ :calibration/status :collecting
+
+ ;; `:unobserved` is intentionally different from zero. Replace one map only
+ ;; after the complete interval fields below are independently attributable.
+ :evidence
+ {:developer-flow {:status :unobserved}
+  :organization-flow {:status :unobserved}
+  :node-flow {:status :unobserved}
+  :entrant-replication []}
+
+ :required-interval-fields
+ [:start-stock
+  :end-stock
+  :duration-years
+  :market
+  :external-rate
+  :average-feedback-stock
+  :average-complement-index]
+
+ :independence-policy
+ {:developer "A contributor not controlled by the owner/operator; owner and automation accounts are excluded."
+  :provider "A capability/component publisher controlled by an independent organization."
+  :organization "An externally controlled active tenant; sign-up alone is insufficient."
+  :node "A compute supplier controlled by an independent operator and observed serving admitted work."
+  :receipt "A settled external receipt tied to an independent customer or supplier."
+  :competitor-work "Completed comparable implementation with attributable elapsed time, equivalent asset units, and variable cost."}
+
+ :collection-gates
+ {:developer-flow
+  "At least two non-zero interval endpoints plus an independently measured external acquisition rate."
+  :organization-flow
+  "Active external organization endpoints, retention-consistent definitions, and average full-stack complement exposure."
+  :node-flow
+  "Independent serving-node endpoints, external onboarding rate, and average active-organization demand."
+  :entrant-replication
+  "One or more completed-work observations containing :equivalent-units, :elapsed-years, and :variable-cost."}}

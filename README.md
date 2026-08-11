@@ -244,10 +244,42 @@ These are **scenario outputs, not forecasts**. In particular, the dollar and
 catch-up range is intentionally wide because Kotoba has no observed competitor
 replication throughput or independently calibrated network coefficient yet.
 Weights also differ across scenarios, so compare the explicit outputs and
-sensitivity, not `Entry_Barrier_Index` across scenarios. Once independent
-cohorts exist, replace the scenario coefficients with measured developer
-referral uplift, provider/component publication rates, organization retention,
-node supply response, and competitor delivery rates.
+not their raw barrier indexes across scenarios.
+
+### Replacing assumptions with measured coefficients
+
+[`examples/kotoba-network-effect-calibration.edn`](examples/kotoba-network-effect-calibration.edn)
+is the measurement boundary. It currently says `:unobserved` for all three
+reinforcing flows and contains no competitor replication observations. This is
+deliberate: zero independent exposure cannot identify a network coefficient.
+
+`calibrate-reinforcing-flow` inverts the exact XMILE flow equation from a
+measured interval:
+
+```text
+coefficient =
+  (observed flow / remaining market fraction - external rate)
+  / (average feedback stock * average complement index)
+```
+
+It returns `:unidentifiable` when feedback exposure is zero and preserves a
+negative raw estimate while bounding the reinforcing-only model coefficient at
+zero. `calibrate-entry-replication` estimates throughput and variable cost only
+from completed comparable work. `calibrate-network-effect-params` applies only
+identified values and lists every scenario assumption it retained, so partial
+evidence cannot relabel the whole model as measured.
+
+```clojure
+(require '[clojure.edn :as edn]
+         '[dynamics.xmile :as dx])
+
+(def calibration
+  (edn/read-string (slurp "examples/kotoba-network-effect-calibration.edn")))
+
+;; base-params is the merged :common + :base scenario map.
+(dx/calibrate-network-effect-params base-params (:evidence calibration))
+;; => {:status :unobserved, :applied {}, :assumptions-retained [...]}
+```
 
 Regenerate and validate the six-model XMILE document:
 

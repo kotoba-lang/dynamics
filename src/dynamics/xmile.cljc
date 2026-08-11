@@ -402,6 +402,144 @@
                    :new-entrant-catchup-cost
                    (nearest-series-value network "New_Entrant_Catchup_Cost" t)}])))}))
 
+(defn calibrate-reinforcing-flow
+  "Estimate one non-negative reinforcing coefficient from a measured interval.
+
+   This inverts the flow shape used by `network-effect-barrier-model`:
+
+     observed flow = (external rate + coefficient * feedback stock
+                      * complement index) * remaining market fraction
+
+   The caller supplies interval averages because endpoints alone cannot identify
+   the path inside the interval. Missing evidence returns `:unobserved`; zero
+   feedback exposure returns `:unidentifiable` rather than inventing a zero
+   coefficient. A negative raw estimate is reported and bounded at zero because
+   the XMILE model represents reinforcing effects only, not displacement/churn.
+
+   Required measured fields:
+   :start-stock, :end-stock, :duration-years, :market, :external-rate,
+   :average-feedback-stock, :average-complement-index."
+  [evidence]
+  (if (or (nil? evidence) (= :unobserved (:status evidence)))
+    {:status :unobserved}
+    (let [required [:start-stock :end-stock :duration-years :market
+                    :external-rate :average-feedback-stock
+                    :average-complement-index]
+          missing (remove #(contains? evidence %) required)]
+      (when (seq missing)
+        (throw (ex-info "calibrate-reinforcing-flow: missing measured fields"
+                        {:missing (vec missing)})))
+      (doseq [k required]
+        (when-not (number? (get evidence k))
+          (throw (ex-info "calibrate-reinforcing-flow: measured field must be numeric"
+                          {:field k :value (get evidence k)}))))
+      (let [{:keys [start-stock end-stock duration-years market external-rate
+                    average-feedback-stock average-complement-index]} evidence]
+        (when-not (and (pos? duration-years) (pos? market))
+          (throw (ex-info "calibrate-reinforcing-flow: duration and market must be positive"
+                          {:duration-years duration-years :market market})))
+        (when-not (and (<= 0 start-stock end-stock market)
+                       (<= 0 external-rate)
+                       (<= 0 average-feedback-stock)
+                       (<= 0 average-complement-index 1))
+          (throw (ex-info "calibrate-reinforcing-flow: evidence is outside the model domain"
+                          {:evidence evidence})))
+        (let [average-target-stock (/ (+ start-stock end-stock) 2.0)
+              remaining-fraction (/ (- market average-target-stock) market)
+              observed-rate (/ (- end-stock start-stock) duration-years)
+              exposure (* average-feedback-stock average-complement-index)]
+          (cond
+            (zero? remaining-fraction)
+            {:status :unidentifiable
+             :reason :no-remaining-market
+             :observed-rate observed-rate
+             :remaining-market-fraction remaining-fraction}
+
+            (zero? exposure)
+            {:status :unidentifiable
+             :reason :zero-feedback-exposure
+             :observed-rate observed-rate
+             :remaining-market-fraction remaining-fraction}
+
+            :else
+            (let [normalized-source (/ observed-rate remaining-fraction)
+                  raw-estimate (/ (- normalized-source external-rate) exposure)]
+              {:status (if (neg? raw-estimate) :bounded-at-zero :calibrated)
+               :estimate (max 0 raw-estimate)
+               :raw-estimate raw-estimate
+               :observed-rate observed-rate
+               :remaining-market-fraction remaining-fraction
+               :feedback-exposure exposure})))))))
+
+(defn calibrate-entry-replication
+  "Estimate entrant replication throughput and variable cost from completed
+   competitor work. Empty/missing observations are `:unobserved`, not zero.
+
+   Each observation must contain positive :equivalent-units and :elapsed-years,
+   plus non-negative :variable-cost. Fixed technical cost is deliberately not
+   inferred from these observations."
+  [observations]
+  (if (empty? observations)
+    {:status :unobserved}
+    (do
+      (doseq [[idx {:keys [equivalent-units elapsed-years variable-cost] :as observation}]
+              (map-indexed vector observations)]
+        (when-not (and (number? equivalent-units) (pos? equivalent-units)
+                       (number? elapsed-years) (pos? elapsed-years)
+                       (number? variable-cost) (<= 0 variable-cost))
+          (throw (ex-info "calibrate-entry-replication: invalid completed-work observation"
+                          {:index idx :observation observation}))))
+      (let [units (reduce + (map :equivalent-units observations))
+            years (reduce + (map :elapsed-years observations))
+            cost (reduce + (map :variable-cost observations))]
+        {:status :calibrated
+         :observation-count (count observations)
+         :equivalent-units units
+         :elapsed-years years
+         :entrant-replication-throughput (/ units years)
+         :entrant-cost-per-unit (/ cost units)}))))
+
+(defn calibrate-network-effect-params
+  "Apply only identifiable measured coefficients to scenario params.
+
+   Evidence keys are :developer-flow, :organization-flow, :node-flow and
+   :entrant-replication. Unobserved/unidentifiable fields remain explicit
+   assumptions in :calibrated-params and are listed under :assumptions-retained.
+   This makes partial calibration safe for YC/evidence reporting: one measured
+   leg cannot silently relabel the whole model as measured."
+  [params evidence]
+  (let [flow-specs [[:developer-flow :developer-network-coefficient]
+                    [:organization-flow :stack-network-coefficient]
+                    [:node-flow :node-demand-coefficient]]
+        flow-results (into {}
+                           (for [[evidence-key _] flow-specs]
+                             [evidence-key
+                              (calibrate-reinforcing-flow (get evidence evidence-key))]))
+        entry-result (calibrate-entry-replication (:entrant-replication evidence))
+        calibrations (assoc flow-results :entrant-replication entry-result)
+        flow-applied (for [[evidence-key param-key] flow-specs
+                           :let [result (get calibrations evidence-key)]
+                           :when (contains? #{:calibrated :bounded-at-zero} (:status result))]
+                       [param-key (:estimate result)])
+        entry-applied (when (= :calibrated (:status entry-result))
+                        [[:entrant-replication-throughput
+                          (:entrant-replication-throughput entry-result)]
+                         [:entrant-cost-per-unit
+                          (:entrant-cost-per-unit entry-result)]])
+        applied (into {} (concat flow-applied entry-applied))
+        candidate-keys [:developer-network-coefficient :stack-network-coefficient
+                        :node-demand-coefficient :entrant-replication-throughput
+                        :entrant-cost-per-unit]
+        retained (vec (remove #(contains? applied %) candidate-keys))]
+    {:status (cond
+               (empty? applied) :unobserved
+               (empty? retained) :calibrated
+               :else :partially-calibrated)
+     :calibrated-params (merge params applied)
+     :applied applied
+     :assumptions-retained retained
+     :calibrations calibrations}))
+
 (defn crossing-year
   "First simulated time at which the stock's series crosses `threshold` in
    the direction implied by `annual-rate`'s sign (rising through it if

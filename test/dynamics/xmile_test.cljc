@@ -223,3 +223,106 @@
     (is (> (:new-entrant-catchup-years y10)
            (get-in summary [:checkpoints 0 :new-entrant-catchup-years])))
     (is (> (:entry-barrier-index y10) 1))))
+
+(deftest reinforcing-flow-calibration-inverts-the-xmile-equation-test
+  (let [evidence {:start-stock 10
+                  :end-stock 16
+                  :duration-years 1
+                  :market 100
+                  :external-rate 2
+                  :average-feedback-stock 13
+                  :average-complement-index 0.5}
+        result (dx/calibrate-reinforcing-flow evidence)
+        expected (/ (- (/ 6 0.87) 2) (* 13 0.5))]
+    (is (= :calibrated (:status result)))
+    (is (< (abs (- expected (:estimate result))) 1e-12))
+    (is (= 6 (:observed-rate result)))
+    (is (= 6.5 (:feedback-exposure result)))))
+
+(deftest reinforcing-flow-calibration-preserves-evidence-boundaries-test
+  (testing "missing observations are unknown rather than a fabricated zero"
+    (is (= {:status :unobserved} (dx/calibrate-reinforcing-flow nil)))
+    (is (= {:status :unobserved}
+           (dx/calibrate-reinforcing-flow {:status :unobserved}))))
+  (testing "zero feedback exposure cannot identify a coefficient"
+    (let [result (dx/calibrate-reinforcing-flow
+                  {:start-stock 0 :end-stock 2 :duration-years 1
+                   :market 100 :external-rate 2
+                   :average-feedback-stock 0
+                   :average-complement-index 0.5})]
+      (is (= :unidentifiable (:status result)))
+      (is (= :zero-feedback-exposure (:reason result)))
+      (is (not (contains? result :estimate)))))
+  (testing "a saturated market cannot identify a coefficient from zero flow"
+    (let [result (dx/calibrate-reinforcing-flow
+                  {:start-stock 100 :end-stock 100 :duration-years 1
+                   :market 100 :external-rate 2
+                   :average-feedback-stock 100
+                   :average-complement-index 1})]
+      (is (= :unidentifiable (:status result)))
+      (is (= :no-remaining-market (:reason result)))))
+  (testing "an observed effect below baseline is visible and bounded at zero"
+    (let [result (dx/calibrate-reinforcing-flow
+                  {:start-stock 10 :end-stock 11 :duration-years 1
+                   :market 100 :external-rate 5
+                   :average-feedback-stock 10
+                   :average-complement-index 0.5})]
+      (is (= :bounded-at-zero (:status result)))
+      (is (neg? (:raw-estimate result)))
+      (is (zero? (:estimate result)))))
+  (testing "a shrinking stock is outside this no-churn adoption model"
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+                          #"outside the model domain"
+                          (dx/calibrate-reinforcing-flow
+                           {:start-stock 10 :end-stock 9 :duration-years 1
+                            :market 100 :external-rate 2
+                            :average-feedback-stock 10
+                            :average-complement-index 0.5})))))
+
+(deftest entry-replication-calibration-uses-completed-work-only-test
+  (is (= {:status :unobserved} (dx/calibrate-entry-replication [])))
+  (let [result (dx/calibrate-entry-replication
+                [{:equivalent-units 10 :elapsed-years 0.5 :variable-cost 1000000}
+                 {:equivalent-units 20 :elapsed-years 1.0 :variable-cost 3000000}])]
+    (is (= :calibrated (:status result)))
+    (is (= 2 (:observation-count result)))
+    (is (= 20.0 (:entrant-replication-throughput result)))
+    (is (< (abs (- (/ 4000000 30) (:entrant-cost-per-unit result))) 1e-9)))
+  (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+                        #"invalid completed-work observation"
+                        (dx/calibrate-entry-replication
+                         [{:equivalent-units 0 :elapsed-years 1 :variable-cost 1}]))))
+
+(deftest partial-calibration-never-relabels-retained-assumptions-test
+  (let [result (dx/calibrate-network-effect-params
+                kotoba-network-base-params
+                {:developer-flow
+                 {:start-stock 10 :end-stock 16 :duration-years 1
+                  :market 100 :external-rate 2
+                  :average-feedback-stock 13
+                  :average-complement-index 0.5}
+                 :organization-flow {:status :unobserved}
+                 :node-flow {:status :unobserved}
+                 :entrant-replication
+                 [{:equivalent-units 10 :elapsed-years 0.5 :variable-cost 1000000}
+                  {:equivalent-units 20 :elapsed-years 1 :variable-cost 3000000}]})
+        calibrated (:calibrated-params result)]
+    (is (= :partially-calibrated (:status result)))
+    (is (= #{:developer-network-coefficient
+             :entrant-replication-throughput
+             :entrant-cost-per-unit}
+           (set (keys (:applied result)))))
+    (is (= [:stack-network-coefficient :node-demand-coefficient]
+           (:assumptions-retained result)))
+    (is (= (:stack-network-coefficient kotoba-network-base-params)
+           (:stack-network-coefficient calibrated)))
+    (is (validate/valid?
+         (validate/validate
+          (dx/network-effect-barrier-model xmile-ns calibrated))))))
+
+(deftest empty-calibration-retains-all-scenario-assumptions-test
+  (let [result (dx/calibrate-network-effect-params kotoba-network-base-params {})]
+    (is (= :unobserved (:status result)))
+    (is (empty? (:applied result)))
+    (is (= kotoba-network-base-params (:calibrated-params result)))
+    (is (= 5 (count (:assumptions-retained result))))))
