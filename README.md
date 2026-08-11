@@ -176,6 +176,88 @@ discipline as `acquisition-model`'s own docstring on feedback extensions.
 ;; => {:checkpoints {5 331.2, 10 812.8, 15 971.6}} -- slow, then fast, then saturating
 ```
 
+## Kotoba stack network effect + entry barrier (XMILE)
+
+`network-effect-barrier-model` adds the missing fourth shape: an executable,
+multi-stock model for Kotoba's developer/provider/component loop, the
+Itonami↔Murakumo↔Kotobase cross-stack loop, and an entrant attempting to
+replicate the moving asset frontier.
+
+The distinction between **owned complements** and an **independent network** is
+load-bearing. The 57 owned `capability-*` repos, 465 owned
+`cloud-itonami-isic-*` components, and 10 operator fleet nodes raise current
+utility and replication work. They do **not** count as independent developers,
+publishers, customers, or compute suppliers. Those independent stocks start at
+the observed values (currently zero except 5 active external organizations),
+then grow only through the explicit scenario flows.
+
+The principal equations are:
+
+```text
+Developer_Adoption =
+  (external rate + developer network coefficient
+   * independent developers * bounded Kotoba complement index)
+  * remaining developer market fraction
+
+Organization_Adoption =
+  (external rate + stack network coefficient
+   * active organizations * bounded full-stack complement index)
+  * remaining organization market fraction
+
+Barrier_Asset_Units =
+  technical base
+  + provider weight * all providers
+  + component weight * all components
+  + receipt weight * verified receipts
+  + organization weight * active organizations
+  + node weight * all compute nodes
+
+New_Entrant_Catchup_Years =
+  Barrier_Asset_Units / entrant replication throughput
+```
+
+Every adoption coefficient, productivity, asset weight, replication throughput,
+and dollar cost is caller-supplied. The library has no hidden "moat constant".
+`network-effect-summary` compares the network-enabled run with the same model
+after setting the three reinforcing coefficients to zero. This makes the
+network-attributed uplift explicit instead of reporting all baseline acquisition
+as a network effect.
+
+The committed scenario inputs are in
+[`examples/kotoba-network-effect-scenarios.edn`](examples/kotoba-network-effect-scenarios.edn).
+They combine dated observed starting stocks with named conservative/base/upside
+assumptions. The generated OASIS XMILE document contains all three scenarios and
+their zero-feedback counterfactuals:
+
+- [`examples/generated/kotoba-network-effect-scenarios.xmile`](examples/generated/kotoba-network-effect-scenarios.xmile)
+- [`examples/generated/kotoba-network-effect-results.edn`](examples/generated/kotoba-network-effect-results.edn)
+
+Headline sensitivity result at year 10:
+
+| scenario | independent developers (no-network) | developer uplift | active orgs (no-network) | new-entrant catch-up | new-entrant cost |
+|---|---:|---:|---:|---:|---:|
+| conservative | 20.38 (19.98) | 1.02× | 10.15 (9.96) | 2.80 years | $8.00M |
+| base | 61.10 (49.88) | 1.23× | 16.27 (14.90) | 14.35 years | $38.87M |
+| upside | 164.13 (99.50) | 1.65× | 30.38 (24.70) | 115.86 years | $286.07M |
+
+These are **scenario outputs, not forecasts**. In particular, the dollar and
+catch-up range is intentionally wide because Kotoba has no observed competitor
+replication throughput or independently calibrated network coefficient yet.
+Weights also differ across scenarios, so compare the explicit outputs and
+sensitivity, not `Entry_Barrier_Index` across scenarios. Once independent
+cohorts exist, replace the scenario coefficients with measured developer
+referral uplift, provider/component publication rates, organization retention,
+node supply response, and competitor delivery rates.
+
+Regenerate and validate the six-model XMILE document:
+
+```bash
+clojure -Sdeps '{:paths ["src" "examples"]
+                  :deps {io.github.kotoba-lang/org-oasis-open-xmile
+                         {:local/root "../org-oasis-open-xmile"}}}' \
+  -M -m generate-kotoba-network-effect
+```
+
 **`dynamics.sysml` also has a second, distinct generic shape**: `fleet-model` +
 `add-fleet-requirement`, for a real population of N same-kind members
 (rather than `acquisition-system`'s fixed 3 roles) that need per-member
@@ -207,9 +289,18 @@ keeping "not applicable" structurally distinct from "measured and failing"):
 ## Test
 
 ```bash
-# needs org-oasis-open-xmile, org-omg-sysmlv2, and dsl-core checked out as
-# siblings (see .github/workflows/ci.yml for the exact pinned refs)
-nbb --classpath "src:test:../org-oasis-open-xmile/src:../org-omg-sysmlv2/src:../dsl-core/src" test/run_tests.cljs
+# Current dsl-core source authority is .kotoba; use the sibling standards
+# libraries while their pinned dsl-core dependency supplies the compiled CLJ
+# validation surface.
+clojure -Sdeps '{:deps {io.github.kotoba-lang/org-oasis-open-xmile
+                        {:local/root "../org-oasis-open-xmile"}
+                        io.github.kotoba-lang/org-omg-sysmlv2
+                        {:local/root "../org-omg-sysmlv2"}}}' \
+  -M:test -e "(require 'dynamics.core-test 'dynamics.xmile-test 'dynamics.sysml-test)
+              (let [r (clojure.test/run-tests 'dynamics.core-test
+                                              'dynamics.xmile-test
+                                              'dynamics.sysml-test)]
+                (System/exit (+ (:fail r) (:error r))))"
 ```
 
 ## License

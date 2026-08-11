@@ -1,0 +1,121 @@
+{:model/id :kotoba-stack-network-effect-and-entry-barrier
+ :model/as-of "2026-08-11"
+ :model/classification :scenario-not-forecast
+ :model/observed-evidence
+ {:owned-capability-providers
+  {:value 57
+   :source "manifest/west.yml entries whose name starts capability-"}
+  :owned-reusable-components
+  {:value 465
+   :source "manifest/west.yml entries whose name starts cloud-itonami-isic-"}
+  :active-organizations
+  {:value 5
+   :source "90-docs/business/metrics/cloud-itonami.edn tenants.externalTotal"}
+  :operator-compute-nodes
+  {:value 10
+   :source "2026-08-05 reachable murakumo fleet measurement recorded by root AGENTS.md"}
+  :independent-developers
+  {:value 0
+   :source "GitHub contributor audit of kotoba/kotoba-lang/compiler/murakumo/kotobase; owner and automation are not independent adopters"}
+  :independent-providers
+  {:value 0
+   :source "no independently published Kotoba capability provider observed"}
+  :independent-compute-nodes
+  {:value 0
+   :source "murakumo metrics federation.active-demand-apps=0 and fleet is one operator"}
+  :verified-external-receipts
+  {:value 0
+   :source "no external paid evaluation receipt observed"}}
+
+ :common
+ {:initial-independent-developers 0
+  :owned-capability-providers 57
+  :initial-independent-providers 0
+  :owned-reusable-components 465
+  :initial-independent-components 0
+  :initial-active-organizations 5
+  :initial-independent-nodes 0
+  :operator-nodes 10
+  :initial-verified-receipts 0
+  :developer-market 10000
+  :organization-market 1000
+  :node-market 1000
+  :provider-scale 100
+  :component-scale 1000
+  :receipt-scale 10000
+  :node-scale 100
+  :sim-years 10}
+
+ ;; Every value below is an explicit sensitivity assumption. None is presented
+ ;; as a measured Kotoba adoption, network, replication-cost or competitor rate.
+ :scenarios
+ {:conservative
+  {:name "Kotoba_Conservative_Network"
+   :external-developer-rate 2
+   :developer-network-coefficient 0.01
+   :provider-productivity 0.05
+   :component-productivity 0.1
+   :external-organization-rate 0.5
+   :stack-network-coefficient 0.01
+   :external-node-rate 0.2
+   :node-demand-coefficient 0.01
+   :receipts-per-organization 12
+   :receipts-per-node 100
+   :complement-value-weight 0.25
+   :technical-base-units 20
+   :provider-barrier-weight 1
+   :component-barrier-weight 0.05
+   :receipt-barrier-weight 0.0005
+   :organization-barrier-weight 2
+   :node-barrier-weight 1
+   :entrant-replication-throughput 50
+   :entrant-cost-per-unit 50000
+   :fixed-technical-cost 1000000}
+
+  :base
+  {:name "Kotoba_Base_Network"
+   :external-developer-rate 5
+   :developer-network-coefficient 0.05
+   :provider-productivity 0.1
+   :component-productivity 0.25
+   :external-organization-rate 1
+   :stack-network-coefficient 0.03
+   :external-node-rate 0.5
+   :node-demand-coefficient 0.05
+   :receipts-per-organization 52
+   :receipts-per-node 500
+   :complement-value-weight 0.5
+   :technical-base-units 50
+   :provider-barrier-weight 1
+   :component-barrier-weight 0.1
+   :receipt-barrier-weight 0.001
+   :organization-barrier-weight 5
+   :node-barrier-weight 3
+   :entrant-replication-throughput 25
+   :entrant-cost-per-unit 100000
+   :fixed-technical-cost 3000000}
+
+  :upside
+  {:name "Kotoba_Upside_Network"
+   :external-developer-rate 10
+   :developer-network-coefficient 0.1
+   :provider-productivity 0.2
+   :component-productivity 0.5
+   :external-organization-rate 2
+   :stack-network-coefficient 0.06
+   :external-node-rate 1
+   :node-demand-coefficient 0.1
+   :receipts-per-organization 100
+   :receipts-per-node 1000
+   :complement-value-weight 1
+   :technical-base-units 100
+   :provider-barrier-weight 2
+   :component-barrier-weight 0.2
+   :receipt-barrier-weight 0.002
+   :organization-barrier-weight 10
+   :node-barrier-weight 5
+   :entrant-replication-throughput 12
+   :entrant-cost-per-unit 200000
+   :fixed-technical-cost 8000000}}
+
+ :checkpoints-years [0 1 3 5 10]}
