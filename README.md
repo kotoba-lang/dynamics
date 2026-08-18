@@ -335,6 +335,41 @@ clojure -Sdeps '{:deps {io.github.kotoba-lang/org-oasis-open-xmile
                 (System/exit (+ (:fail r) (:error r))))"
 ```
 
+## The scalar decision core in Kotoba
+
+`kotoba/dynamics_score_core.kotoba` carries the arithmetic that decides a
+score -- `band-weight`, `leverage-score`'s `:base-score` and
+`:expected-yield`, `loop-structural-strength`, `upper-bound-rate-from-zero-events`,
+`cagr` and `real-growth` -- with no host math library underneath it. `pow` is
+reconstructed from the compiler's bounded exp/log intrinsics rather than
+`Math/pow`/`js/Math.pow`, which is the one place this library previously
+rested on a runtime's numerics.
+
+**`src/` is unchanged and remains the authority and the load path.** Nothing
+requires the port at runtime; `kotoba-lang/amu` is a test-only dependency. The
+two are pinned together by a parity gate:
+
+```bash
+clojure -M:parity -m cognitect.test-runner \
+  -n dynamics.kotoba-score-core-parity-test
+```
+
+The gate has two halves that are deliberately not merged. The pure-arithmetic
+measures are compared **exactly** -- `loop-structural-strength` folds
+`(* a b c d)` to the left, and regrouping those multiplications is
+algebraically identical and not identical in IEEE, so an ulp of difference
+there is a defect rather than rounding. The pow-bearing measures are compared
+**within 1e-12 relative**, because the port imports no host transcendental and
+claiming bit equality would be a lie; the worst error actually observed is
+printed on every run (currently 7.1e-15, about 140x inside the bound).
+
+**What this does not claim.** It does not claim `dynamics.core` runs without a
+JVM or a JS engine. `rank-interventions`, `meadows-bands`, `loop-archetypes`,
+`compare-archetypes-2d`, `regime-changes` and `money-loop-measures` are all
+still `.cljc` and all still need a host. What is asserted is narrower and is
+exactly what it says: the scalar arithmetic that decides a score is reproduced
+by a module that imports no host math.
+
 ## License
 
 MIT.
