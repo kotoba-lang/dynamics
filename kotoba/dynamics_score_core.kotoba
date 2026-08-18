@@ -1,0 +1,176 @@
+(ns dynamics-score-core
+  (:export [band-weight leverage-base expected-yield
+            loop-structural-strength
+            pow upper-bound-rate-from-zero-events
+            cagr real-growth]))
+
+;; The scalar decision core of `dynamics.core` (Meadows leverage-point scoring
+;; and the loop/growth measures), written in Kotoba. `kotoba/pure`: no
+;; capabilities, no ambient authority, numbers in and numbers out.
+;;
+;; WHY THIS FILE EXISTS. `src/dynamics/core.cljc` is the library CLAUDE.md
+;; names as the place system-dynamics scoring is computed ("計算そのものは
+;; kotoba-lang/dynamics を使う。ゼロから再発明しない"), and every number it
+;; produces rested on a host runtime: `pow` is sixteen characters of reader
+;; conditional binding `Math/pow` on the JVM and `js/Math.pow` on
+;; ClojureScript, and everything else is host double arithmetic. Measured
+;; 2026-08-18, this repository contained zero `.kotoba` bytes. This module
+;; carries the same arithmetic with no host math library underneath it: `pow`
+;; is reconstructed from the compiler's own bounded exp/log intrinsics (amu
+;; docs/adr/0012), which is why the two agree to ~1e-15 on the pow-bearing
+;; measures rather than bit-for-bit -- see the parity gate.
+;;
+;; WHAT IS NOT HERE, AND WHY. `rank-interventions` sorts a collection,
+;; `meadows-bands` is a map of records, `loop-archetypes` is a 700-line
+;; catalog, and `compare-archetypes-2d` correlates two rankings. All of that
+;; stays in `.cljc`. This is the decision-core shape the workspace rule
+;; prescribes (root CLAUDE.md, "移行の単位は決定核"): the scalars that decide
+;; a score cross, the collection assembly around them does not.
+;;
+;; ERRORS ARE VALUES. `dynamics.core` says nil -- never 0 -- when a measure is
+;; not computable from what the caller has, and the docstrings are emphatic
+;; that this is a different fact from "flat" or "zero". Here that is
+;; `[:result :f64 :string]`: `throw` is unavailable by design (root CLAUDE.md,
+;; ":intentional-security-constraint"), and a Result makes the refusal a value
+;; the caller must open rather than a nil that flows on.
+;;
+;; ABSENCE IS NOT REFUSAL. Where the `.cljc` guard is `(number? x)` -- "did the
+;; caller have this at all" -- the port has no corresponding branch, because an
+;; `:f64` parameter cannot be absent. Those guards are a dynamic language
+;; checking its own arguments, not a decision this core makes. Only guards that
+;; reject a value that IS a number (a non-positive start, an inflation of
+;; -100%, a confidence outside (0,1)) become refusals below.
+
+(defn ok [x :f64] [:result :f64 :string]
+  (result-ok-of [:result :f64 :string] x))
+
+(defn err [message :string] [:result :f64 :string]
+  (result-err-of [:result :f64 :string] message))
+
+;; --- Meadows bands (1999), collapsed to 5 -----------------------------------
+;; The ordinal weights of `dynamics.core/meadows-bands`. Unknown band refuses:
+;; the `.cljc` `get-in` would hand back nil and `(* nil tractability)` would
+;; throw, so nothing downstream ever saw a weight-less band as a number.
+
+(defn band-weight [band :keyword] [:result :f64 :string]
+  (if (= band :band/E) (ok 1.0)
+    (if (= band :band/D) (ok 3.0)
+      (if (= band :band/C) (ok 5.0)
+        (if (= band :band/B) (ok 7.0)
+          (if (= band :band/A) (ok 10.0)
+            (err "unknown Meadows band")))))))
+
+;; --- intervention scoring ---------------------------------------------------
+;; `leverage-score`'s :base-score. The `.cljc` precondition is
+;; `(<= 0 tractability 1)`; a tractability outside that is a caller error, and
+;; asserting it here keeps the refusal in the core rather than in the host.
+;; NaN fails `f64-ge`/`f64-le` and so refuses, which is what the .cljc
+;; assertion does with NaN too.
+
+(defn leverage-base [band :keyword tractability :f64] [:result :f64 :string]
+  (if (f64-ge tractability 0.0)
+    (if (f64-le tractability 1.0)
+      (let [w (band-weight band)]
+        (if (result-ok?-of [:result :f64 :string] w)
+          (ok (f64-mul (result-value-of [:result :f64 :string] w 0.0) tractability))
+          w))
+      (err "tractability above 1"))
+    (err "tractability below 0")))
+
+;; The load-bearing distinction of the whole model (`leverage-score`'s
+;; docstring): a pool with a MEASURED conversion rate yields a number, and one
+;; without is `:uncomputable-until-measured` -- never silently zero. The port
+;; keeps both halves: the caller that has a rate calls this, and the caller
+;; that does not has nothing to call. That is the same distinction the keyword
+;; draws, moved from a sentinel value into the type.
+
+(defn expected-yield [pool-size :f64 conversion-rate :f64] :f64
+  (f64-mul pool-size conversion-rate))
+
+;; --- loop structural strength ----------------------------------------------
+;; `(* cycles-per-year (+ 0.1 self-funding) (+ 0.1 instrumentation)
+;;     (- 1.1 friction))`, left-associated exactly as `clojure.core/*` folds
+;; it. The association is load-bearing for bit equality: regrouping these four
+;; multiplications is algebraically identical and not identical in IEEE.
+
+(defn cycles-per-year [cycle-time-days :f64] :f64
+  (f64-div 365.0 cycle-time-days))
+
+(defn loop-structural-strength
+  [cycle-time-days :f64 self-funding :f64 instrumentation :f64 friction :f64] :f64
+  (f64-mul
+    (f64-mul
+      (f64-mul (cycles-per-year cycle-time-days) (f64-add 0.1 self-funding))
+      (f64-add 0.1 instrumentation))
+    (f64-sub 1.1 friction)))
+
+;; --- pow, without a host math library ---------------------------------------
+;; Same reconstruction as the XMILE port (root ADR-2608189400), matching
+;; `Math/pow` on the three cases it handles by convention:
+;;   base > 0  exp(e * ln base), inside the intrinsics' domains
+;;   base = 0  0 for e>0, 1 for e=0, +Inf for e<0
+;;   base < 0  defined only for integral e; NaN otherwise
+;; Both call sites below guard base > 0, so only the first branch is reachable
+;; from them; the rest is here so the function is not a trap for a third caller.
+
+(defn floor [x :f64] :f64
+  (let [truncated (i64-to-f64-rounded (f64-to-i64-truncating x))]
+    (if (f64-lt x truncated) (f64-sub truncated 1.0) truncated)))
+
+(defn mod-2 [e :f64] :f64
+  (f64-sub e (f64-mul 2.0 (floor (f64-div e 2.0)))))
+
+(defn pow [base :f64 e :f64] :f64
+  (if (f64-gt base 0.0)
+    (f64-exp-bounded (f64-mul e (f64-log-bounded base)))
+    (if (f64-eq base 0.0)
+      (if (f64-gt e 0.0)
+        0.0
+        (if (f64-eq e 0.0) 1.0 (f64-div 1.0 0.0)))
+      (if (f64-eq e (floor e))
+        (let [magnitude (f64-exp-bounded (f64-mul e (f64-log-bounded (f64-neg base))))]
+          (if (f64-eq (mod-2 e) 0.0) magnitude (f64-neg magnitude)))
+        (f64-div 0.0 0.0)))))
+
+;; --- zero-events upper bound ------------------------------------------------
+;; `1 - (1-confidence)^(1/n)`: the exact (1-confidence) upper bound on a
+;; Bernoulli rate given ZERO successes in n trials. The `.cljc` states this as
+;; a precondition (`(pos? n)`, `(< 0 confidence 1)`) and so raises rather than
+;; returning nil; here it is a refusal. The parity gate compares the two as
+;; "both refuse", not as "both raise the same thing".
+
+(defn upper-bound-rate-from-zero-events [n :i64 confidence :f64] [:result :f64 :string]
+  (if (> n 0)
+    (if (f64-gt confidence 0.0)
+      (if (f64-lt confidence 1.0)
+        (ok (f64-sub 1.0
+              (pow (f64-sub 1.0 confidence)
+                   (f64-div 1.0 (i64-to-f64-rounded n)))))
+        (err "confidence at or above 1"))
+      (err "confidence at or below 0"))
+    (err "trial count not positive")))
+
+;; --- growth measures --------------------------------------------------------
+;; `cagr` refuses on a non-positive start (no meaningful ratio), a non-positive
+;; year count, or a non-positive end -- "not computable from what we have",
+;; which the docstring insists is a different fact from "flat". NaN refuses
+;; through the same comparisons, since `pos?` is false for NaN.
+
+(defn cagr [start :f64 end :f64 years :f64] [:result :f64 :string]
+  (if (f64-gt start 0.0)
+    (if (f64-gt years 0.0)
+      (if (f64-gt end 0.0)
+        (ok (f64-sub (pow (f64-div end start) (f64-div 1.0 years)) 1.0))
+        (err "end not positive"))
+      (err "years not positive"))
+    (err "start not positive")))
+
+;; Exact deflation, `(1+nominal)/(1+inflation) - 1` -- NOT nominal minus
+;; inflation. The docstring is explicit that the subtraction approximation is
+;; fine at 2% and badly wrong at 200%, and that this catalog holds economies at
+;; both ends. Refuses when the denominator vanishes (inflation <= -100%).
+
+(defn real-growth [nominal :f64 inflation :f64] [:result :f64 :string]
+  (if (f64-gt (f64-add 1.0 inflation) 0.0)
+    (ok (f64-sub (f64-div (f64-add 1.0 nominal) (f64-add 1.0 inflation)) 1.0))
+    (err "inflation at or below -100%")))
