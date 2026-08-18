@@ -8,6 +8,27 @@
 ;; and the loop/growth measures), written in Kotoba. `kotoba/pure`: no
 ;; capabilities, no ambient authority, numbers in and numbers out.
 ;;
+;; THIS FILE IS THE AUTHORITY. `src/dynamics/core.cljc` is the reference
+;; implementation and the load path -- it is what consumers require, because a
+;; `.cljc` is what a JVM and a JS runtime can both `require`. But when the two
+;; disagree about a number, THIS FILE IS RIGHT and the `.cljc` is the thing
+;; that gets fixed. `dynamics-score-core-check` enforces that in both
+;; directions, against the compiled artifact beside this file
+;; (`dynamics_score_core.mjs`), under node with no JVM anywhere in the loop.
+;;
+;; The `.cljc` is deliberately NOT deleted. `kotoba-lang/dsl-core` replaced
+;; `problem.cljc` with `problem.kotoba` and left 12 consumer repositories
+;; unable to load for 23 days (root ADR-2608071000 / ADR-2608130900), because
+;; a `.kotoba` is not on anybody's classpath. Authority moves here; the load
+;; path stays where callers can reach it.
+;;
+;; IF YOU EDIT THIS FILE, RECOMPILE THE ARTIFACT. The gate binds
+;; `dynamics_score_core.mjs`'s `sourceDigest` to this file's sha256, so a
+;; forgotten recompile is caught rather than silently gating an old kernel:
+;;
+;;   amu compile <abs>/kotoba/dynamics_score_core.kotoba --target js \
+;;     --output <abs>/kotoba/dynamics_score_core.mjs
+;;
 ;; WHY THIS FILE EXISTS. `src/dynamics/core.cljc` is the library CLAUDE.md
 ;; names as the place system-dynamics scoring is computed ("計算そのものは
 ;; kotoba-lang/dynamics を使う。ゼロから再発明しない"), and every number it

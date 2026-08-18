@@ -1,27 +1,4 @@
 {:paths ["src"]
  :deps {}
  :aliases
- {:test {:extra-paths ["test"]}
-
-  ;; The Kotoba parity gate (root ADR-2608189400 established this boundary for
-  ;; the XMILE port). Deliberately a SEPARATE alias from :test, for two
-  ;; reasons. It is JVM-only, because that is where amu compiles, while the
-  ;; portable suite runs under nbb via test/run_tests.cljs. And it selects its
-  ;; own namespace: dynamics.xmile-test and dynamics.sysml-test require
-  ;; sibling repositories (org-oasis-open-xmile, org-omg-sysmlv2) that are not
-  ;; runtime deps of this library, so loading all of test/ on the JVM fails on
-  ;; a missing sysml.model rather than on anything this gate is about.
-  ;;
-  ;;   clojure -M:parity -m cognitect.test-runner \
-  ;;     -n dynamics.kotoba-score-core-parity-test
-  ;;
-  ;; kotoba-lang/amu is TEST-ONLY. The library has no runtime dependency on
-  ;; it, and no .cljc under src/ is removed or changed by the port -- the same
-  ;; boundary kotoba-lang/css, kotoba-lang/dsl-core and org-oasis-open-xmile
-  ;; draw.
-  :parity {:extra-paths ["test"]
-           :extra-deps {io.github.cognitect-labs/test-runner
-                        {:git/tag "v0.5.1" :git/sha "dfb30dd"}
-                        io.github.kotoba-lang/amu
-                        {:git/url "https://github.com/kotoba-lang/amu.git"
-                         :git/sha "29e8386aa4d6a24d0ade6617aaac763af330179c"}}}}}
+ {:test {:extra-paths ["test"]}}}
