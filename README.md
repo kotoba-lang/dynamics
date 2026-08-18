@@ -337,38 +337,71 @@ clojure -Sdeps '{:deps {io.github.kotoba-lang/org-oasis-open-xmile
 
 ## The scalar decision core in Kotoba
 
-`kotoba/dynamics_score_core.kotoba` carries the arithmetic that decides a
-score -- `band-weight`, `leverage-score`'s `:base-score` and
-`:expected-yield`, `loop-structural-strength`, `upper-bound-rate-from-zero-events`,
-`cagr` and `real-growth` -- with no host math library underneath it. `pow` is
-reconstructed from the compiler's bounded exp/log intrinsics rather than
-`Math/pow`/`js/Math.pow`, which is the one place this library previously
-rested on a runtime's numerics.
+**`kotoba/dynamics_score_core.kotoba` is the authority for this library's score
+arithmetic.** It carries `band-weight`, `leverage-score`'s `:base-score` and
+`:expected-yield`, `loop-structural-strength`,
+`upper-bound-rate-from-zero-events`, `cagr` and `real-growth` with no host math
+library underneath it: `pow` is reconstructed from the compiler's bounded
+exp/log intrinsics rather than `Math/pow`/`js/Math.pow`, which was the one
+place this library rested on a runtime's numerics.
 
-**`src/` is unchanged and remains the authority and the load path.** Nothing
-requires the port at runtime; `kotoba-lang/amu` is a test-only dependency. The
-two are pinned together by a parity gate:
+`src/dynamics/core.cljc` remains the **reference implementation and the load
+path** -- it is what consumers require, because a `.cljc` is what a JVM and a
+JS runtime can both `require`. When the two disagree about a number, **the
+kernel is right and the `.cljc` is what gets fixed.**
+
+The `.cljc` is deliberately not deleted. `kotoba-lang/dsl-core` replaced
+`problem.cljc` with `problem.kotoba` and left 12 consumer repositories unable
+to load for 23 days, because a `.kotoba` is not on anybody's classpath.
+Authority moves to the kernel; the load path stays where callers can reach it.
+
+### Running the gate
+
+`dynamics_score_core.mjs` is the compiled `:js-kotoba-v1` artifact, committed
+beside its source. The gate imports it under node and compares every case
+against the `.cljc`:
 
 ```bash
-clojure -M:parity -m cognitect.test-runner \
-  -n dynamics.kotoba-score-core-parity-test
+nbb <root>/scripts/fleet-ci/gates/dynamics-score-core-check.cljs .
 ```
 
-The gate has two halves that are deliberately not merged. The pure-arithmetic
-measures are compared **exactly** -- `loop-structural-strength` folds
-`(* a b c d)` to the left, and regrouping those multiplications is
-algebraically identical and not identical in IEEE, so an ulp of difference
-there is a defect rather than rounding. The pow-bearing measures are compared
-**within 1e-12 relative**, because the port imports no host transcendental and
-claiming bit equality would be a lie; the worst error actually observed is
-printed on every run (currently 7.1e-15, about 140x inside the bound).
+**No JVM is involved at any point in that command** -- it is nbb driving a
+restricted ESM module. A JVM is needed only to *produce* the artifact, the way
+a compiler is needed to produce a binary:
+
+```bash
+amu compile <abs>/kotoba/dynamics_score_core.kotoba --target js \
+  --output <abs>/kotoba/dynamics_score_core.mjs
+```
+
+The gate binds the artifact to its source by sha256, so a forgotten recompile
+fails loudly instead of silently gating an old kernel.
+
+### What the gate checks
+
+1. **artifact ↔ source** -- the `.mjs`'s `sourceDigest` equals the `.kotoba`'s
+   sha256.
+2. **purity** -- `requiredCapabilities` is empty, and an unreadable field is
+   not read as empty.
+3. **parity, exact** -- `band-weight`, `leverage-base`, `expected-yield`,
+   `loop-structural-strength`, `real-growth`. No epsilon: both sides are IEEE
+   operations or a selection, so one ulp is a defect. `loop-structural-strength`
+   folds `(* a b c d)` to the left, and regrouping those multiplications is
+   algebraically identical and not identical in IEEE.
+4. **parity, within 1e-12 relative** -- `pow`, `cagr`,
+   `upper-bound-rate-from-zero-events`. The kernel imports no host
+   transcendental, so bit equality is not available and claiming it would be a
+   lie. The worst error observed is printed every run (currently 7.1e-15).
+5. **evidence floor** -- a global case floor plus a per-table ratchet, because
+   a global total alone does not catch one table being gutted while the others
+   hold the count up.
 
 **What this does not claim.** It does not claim `dynamics.core` runs without a
 JVM or a JS engine. `rank-interventions`, `meadows-bands`, `loop-archetypes`,
 `compare-archetypes-2d`, `regime-changes` and `money-loop-measures` are all
 still `.cljc` and all still need a host. What is asserted is narrower and is
-exactly what it says: the scalar arithmetic that decides a score is reproduced
-by a module that imports no host math.
+exactly what it says: the scalar arithmetic that decides a score has moved to
+Kotoba, and the `.cljc` is now checked against it.
 
 ## License
 
