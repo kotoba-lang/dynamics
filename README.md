@@ -284,7 +284,7 @@ evidence cannot relabel the whole model as measured.
 Regenerate and validate the six-model XMILE document:
 
 ```bash
-clojure -Sdeps '{:paths ["src" "examples"]
+kbb -Sdeps '{:paths ["src" "examples"]
                   :deps {io.github.kotoba-lang/org-oasis-open-xmile
                          {:local/root "../org-oasis-open-xmile"}}}' \
   -M -m generate-kotoba-network-effect
@@ -324,7 +324,7 @@ keeping "not applicable" structurally distinct from "measured and failing"):
 # Current dsl-core source authority is .kotoba; use the sibling standards
 # libraries while their pinned dsl-core dependency supplies the compiled CLJ
 # validation surface.
-clojure -Sdeps '{:deps {io.github.kotoba-lang/org-oasis-open-xmile
+kbb -Sdeps '{:deps {io.github.kotoba-lang/org-oasis-open-xmile
                         {:local/root "../org-oasis-open-xmile"}
                         io.github.kotoba-lang/org-omg-sysmlv2
                         {:local/root "../org-omg-sysmlv2"}}}' \
