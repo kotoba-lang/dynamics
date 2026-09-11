@@ -8,7 +8,7 @@
 ;; and the loop/growth measures), written in Kotoba. `kotoba/pure`: no
 ;; capabilities, no ambient authority, numbers in and numbers out.
 ;;
-;; THIS FILE IS THE AUTHORITY. `src/dynamics/core.cljc` is the reference
+;; THIS FILE IS THE AUTHORITY. `src/dynamics/core.cljk` is the reference
 ;; implementation and the load path -- it is what consumers require, because a
 ;; `.cljc` is what a JVM and a JS runtime can both `require`. But when the two
 ;; disagree about a number, THIS FILE IS RIGHT and the `.cljc` is the thing
@@ -29,7 +29,7 @@
 ;;   amu compile <abs>/kotoba/dynamics_score_core.kotoba --target js \
 ;;     --output <abs>/kotoba/dynamics_score_core.mjs
 ;;
-;; WHY THIS FILE EXISTS. `src/dynamics/core.cljc` is the library CLAUDE.md
+;; WHY THIS FILE EXISTS. `src/dynamics/core.cljk` is the library CLAUDE.md
 ;; names as the place system-dynamics scoring is computed ("計算そのものは
 ;; kotoba-lang/dynamics を使う。ゼロから再発明しない"), and every number it
 ;; produces rested on a host runtime: `pow` is sixteen characters of reader
