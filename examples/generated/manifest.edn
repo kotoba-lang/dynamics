@@ -1,4 +1,4 @@
-#:generated{:by "examples/generate_kotoba_network_effect.clj",
+#:generated{:by "examples/generate_kotoba_network_effect.cljk",
             :source "examples/kotoba-network-effect-scenarios.edn",
             :source-sha256
             "1835275b527f423b1581301b58ced3a152f5b4761eade1d9c5b32e6b046b1912",

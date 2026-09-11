@@ -103,7 +103,7 @@
                                                     checkpoints-years)}]))})
      (write-edn!
       manifest-path
-      {:generated/by "examples/generate_kotoba_network_effect.clj"
+      {:generated/by "examples/generate_kotoba_network_effect.cljk"
        :generated/source input-path
        :generated/source-sha256 (sha256-file input-path)
        :generated/artifacts
