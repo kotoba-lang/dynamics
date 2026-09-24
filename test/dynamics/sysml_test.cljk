@@ -1,5 +1,5 @@
 (ns dynamics.sysml-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [dynamics.sysml :as ds]
             [sysml.model :as sm]
             [sysml.validate :as validate]))
