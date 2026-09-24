@@ -1,0 +1,26 @@
+{
+  "jobs": [
+    {
+      "base_url": "https://api.kotoba.cloud/v1",
+      "context_from": null,
+      "deliver": "local",
+      "enabled": true,
+      "enabled_toolsets": null,
+      "id": "c8924e643c3d",
+      "model": "qwen3.8-flash-next-whitehacker",
+      "name": "cron-econ-audit",
+      "no_agent": true,
+      "prompt": "",
+      "provider": "kotoba",
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 6 * * *",
+        "display": "0 6 * * *"
+      },
+      "script": "cron-econ-audit.py",
+      "skill": null,
+      "skills": [],
+      "workdir": null
+    }
+  ]
+}
