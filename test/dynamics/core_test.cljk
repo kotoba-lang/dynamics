@@ -1,5 +1,5 @@
 (ns dynamics.core-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [dynamics.core :as d]))
 
 (deftest meadows-bands-ordering-test
