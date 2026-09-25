@@ -1,6 +1,6 @@
 (ns generate-kotoba-network-effect
   (:require [kotoba.lang.edn :as edn]
-            [clojure.java.io :as io]
+            [kotoba.io :as io]
             [kotoba.pprint :as pprint]
             [dynamics.xmile :as dx]
             [xmile.execute :as execute]

@@ -173,11 +173,11 @@
 
 (deftest network-effect-barrier-model-requires-explicit-honest-inputs-test
   (testing "missing scenario coefficients fail closed instead of silently gaining defaults"
-    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+    (is (thrown-with-msg? js/Error
                           #"missing required parameters"
                           (dx/network-effect-barrier-model xmile-ns {:name "incomplete"}))))
   (testing "zero replication throughput is invalid because catch-up time would be undefined"
-    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+    (is (thrown-with-msg? js/Error
                           #"must be positive"
                           (dx/network-effect-barrier-model
                            xmile-ns (assoc kotoba-network-base-params
@@ -271,7 +271,7 @@
       (is (neg? (:raw-estimate result)))
       (is (zero? (:estimate result)))))
   (testing "a shrinking stock is outside this no-churn adoption model"
-    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+    (is (thrown-with-msg? js/Error
                           #"outside the model domain"
                           (dx/calibrate-reinforcing-flow
                            {:start-stock 10 :end-stock 9 :duration-years 1
@@ -288,7 +288,7 @@
     (is (= 2 (:observation-count result)))
     (is (= 20.0 (:entrant-replication-throughput result)))
     (is (< (abs (- (/ 4000000 30) (:entrant-cost-per-unit result))) 1e-9)))
-  (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+  (is (thrown-with-msg? js/Error
                         #"invalid completed-work observation"
                         (dx/calibrate-entry-replication
                          [{:equivalent-units 0 :elapsed-years 1 :variable-cost 1}]))))
