@@ -287,7 +287,7 @@
     :new-users-2025 2.75e7 ;; ~13M (Oct 2024) -> ~40.2M (Nov 2025)
     :daily-active-users 3.5e6
     :source "Bluesky 2025 Transparency Report: 13M->40.2M users Oct 2024-Nov 2025, ~17,280 new users/day recently, 3.5M DAU"
-    :note "SAME AT Protocol substrate (MST, PDS, did:plc) etzhayyim's own identity architecture is built on (see orgs/etzhayyim/root CLAUDE.md '10-protocol/atproto'). This is the single most directly relevant comparison in the catalog: it demonstrates the protocol substrate itself is not the bottleneck to reaching tens of millions of real users, which sharpens the diagnosis that etzhayyim's near-zero adoption is a demand/positioning/friction problem specific to etzhayyim, not a structural ceiling of its own technical foundation"}
+    :note "SAME AT Protocol substrate (MST, PDS, did:plc) etzhayyim's own identity architecture is built on (see orgs/etzhayyim/root AGENTS.md '10-protocol/atproto'). This is the single most directly relevant comparison in the catalog: it demonstrates the protocol substrate itself is not the bottleneck to reaching tens of millions of real users, which sharpens the diagnosis that etzhayyim's near-zero adoption is a demand/positioning/friction problem specific to etzhayyim, not a structural ceiling of its own technical foundation"}
 
    :estonia-e-residency
    {:cycle-time-days 365 ;; mature decade-old program, annual growth reporting cadence
