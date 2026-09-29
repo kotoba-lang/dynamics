@@ -29,7 +29,7 @@
 ;;   amu compile <abs>/kotoba/dynamics_score_core.kotoba --target js \
 ;;     --output <abs>/kotoba/dynamics_score_core.mjs
 ;;
-;; WHY THIS FILE EXISTS. `src/dynamics/core.cljk` is the library CLAUDE.md
+;; WHY THIS FILE EXISTS. `src/dynamics/core.cljk` is the library AGENTS.md
 ;; names as the place system-dynamics scoring is computed ("計算そのものは
 ;; kotoba-lang/dynamics を使う。ゼロから再発明しない"), and every number it
 ;; produces rested on a host runtime: `pow` is sixteen characters of reader
@@ -45,13 +45,13 @@
 ;; `meadows-bands` is a map of records, `loop-archetypes` is a 700-line
 ;; catalog, and `compare-archetypes-2d` correlates two rankings. All of that
 ;; stays in `.cljc`. This is the decision-core shape the workspace rule
-;; prescribes (root CLAUDE.md, "移行の単位は決定核"): the scalars that decide
+;; prescribes (root AGENTS.md, "移行の単位は決定核"): the scalars that decide
 ;; a score cross, the collection assembly around them does not.
 ;;
 ;; ERRORS ARE VALUES. `dynamics.core` says nil -- never 0 -- when a measure is
 ;; not computable from what the caller has, and the docstrings are emphatic
 ;; that this is a different fact from "flat" or "zero". Here that is
-;; `[:result :f64 :string]`: `throw` is unavailable by design (root CLAUDE.md,
+;; `[:result :f64 :string]`: `throw` is unavailable by design (root AGENTS.md,
 ;; ":intentional-security-constraint"), and a Result makes the refusal a value
 ;; the caller must open rather than a nil that flows on.
 ;;

@@ -93,7 +93,7 @@ computational substrate for system dynamics in kotoba-lang (`ADR-2607072350`,
 `loop-structural-strength` were built two weeks later (`ADR-2607203000`,
 2026-07-20) without checking for it first -- exactly the "did you check for
 existing infrastructure before building new" failure mode this workspace's
-own CLAUDE.md repeatedly warns about elsewhere (BMC/Lean Loop tracking,
+own AGENTS.md repeatedly warns about elsewhere (BMC/Lean Loop tracking,
 design-quality scoring, coscientist loops). `loop-structural-strength`
 itself stays (it is a genuinely different, cheaper question -- comparative
 ranking from 4 coarse parameters, no full equation model needed per
